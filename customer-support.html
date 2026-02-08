@@ -897,656 +897,380 @@
         </div>
     </div>
 
-    <script>
-        // Advanced Real Customer Support System
-        document.addEventListener('DOMContentLoaded', function() {
-            // Core Configuration
-            const CONFIG = {
-                AI_API_KEY: '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',
-                COMPANY_INFO: {
-                    name: 'CryptoBridge',
-                    supportEmail: 'support@cryptobridge.com',
-                    phone: '+1 (888) 555-0123',
-                    hours: '24/7',
-                    license: 'CR-2023-456789',
-                    address: '123 Financial District, San Francisco, CA 94111'
-                },
-                PROCESSING_TIMES: {
-                    normal: '5-15 minutes',
-                    extended: '15-30 minutes (rare)',
-                    verification: '5 minutes',
-                    blockchain: '5-30 minutes'
-                }
-            };
-
-            // DOM Elements
-            const elements = {
-                supportToggle: document.getElementById('supportToggle'),
-                supportContainer: document.getElementById('supportContainer'),
-                agentName: document.getElementById('agentName'),
-                agentAvatar: document.getElementById('agentAvatar'),
-                supportMessages: document.getElementById('supportMessages'),
-                supportInput: document.getElementById('supportInput'),
-                sendButton: document.getElementById('sendButton'),
-                quickActions: document.getElementById('quickActions'),
-                ticketSystem: document.getElementById('ticketSystem'),
-                successState: document.getElementById('successState'),
-                notificationBadge: document.getElementById('notificationBadge'),
-                minimizeChat: document.getElementById('minimizeChat'),
-                closeChat: document.getElementById('closeChat')
-            };
-
-            // State Management
-            const state = {
-                isOpen: false,
-                isTyping: false,
-                conversationHistory: [],
-                currentAgent: null,
-                userSentiment: 'neutral',
-                ticketData: {},
-                unreadMessages: 0,
-                typingTimeout: null,
-                lastInteraction: Date.now()
-            };
-
-            // Enhanced Support Agents with Personalities
-            const SUPPORT_AGENTS = [
-                {
-                    id: 'sarah',
-                    name: 'Sarah Johnson',
-                    title: 'Senior Support Specialist',
-                    avatar: '👩‍💼',
-                    color: '#2563eb',
-                    personality: 'empathetic',
-                    specialty: 'transaction_help',
-                    experience: '8 years in crypto support',
-                    responseStyle: 'warm, detailed, reassuring',
-                    workingHours: '9AM-6PM PST',
-                    languages: ['English', 'Spanish']
-                },
-                {
-                    id: 'michael',
-                    name: 'Michael Chen',
-                    title: 'Transaction Expert',
-                    avatar: '👨‍💻',
-                    color: '#10b981',
-                    personality: 'analytical',
-                    specialty: 'technical_issues',
-                    experience: '6 years blockchain expert',
-                    responseStyle: 'precise, technical, solution-oriented',
-                    workingHours: '24/7 rotating',
-                    languages: ['English', 'Mandarin']
-                },
-                {
-                    id: 'emma',
-                    name: 'Emma Rodriguez',
-                    title: 'Customer Success Manager',
-                    avatar: '👩‍💼',
-                    color: '#8b5cf6',
-                    personality: 'nurturing',
-                    specialty: 'account_issues',
-                    experience: '7 years fintech support',
-                    responseStyle: 'caring, patient, thorough',
-                    workingHours: '10AM-7PM PST',
-                    languages: ['English', 'Spanish', 'Portuguese']
-                },
-                {
-                    id: 'david',
-                    name: 'David Wilson',
-                    title: 'Payment Processing Lead',
-                    avatar: '👨‍💼',
-                    color: '#f59e0b',
-                    personality: 'efficient',
-                    specialty: 'payment_issues',
-                    experience: '9 years payment systems',
-                    responseStyle: 'direct, efficient, reassuring',
-                    workingHours: '24/7 on-call',
-                    languages: ['English', 'French']
-                }
-            ];
-
-            // Emotional Responses Database
-            const EMOTIONAL_RESPONSES = {
-                worried: [
-                    "I completely understand why you'd be concerned. Let me reassure you...",
-                    "It's completely normal to feel worried about transactions. I'm here to help put your mind at ease...",
-                    "I can hear the concern in your message. Don't worry - we'll sort this out together...",
-                    "Thank you for sharing your concern with me. Let me provide some clarity on this..."
-                ],
-                frustrated: [
-                    "I apologize for the frustration you're experiencing. That sounds really frustrating...",
-                    "I'd be frustrated too in that situation. Let me help resolve this for you...",
-                    "I'm sorry you're going through this. Let me take care of it for you...",
-                    "That sounds incredibly frustrating. I'm going to personally ensure this gets resolved..."
-                ],
-                confused: [
-                    "That's a great question and I'd be happy to clarify this for you...",
-                    "I can see how that might be confusing. Let me break it down simply...",
-                    "That's actually a common point of confusion. Here's what you need to know...",
-                    "I appreciate you asking for clarification. Let me explain this clearly..."
-                ],
-                happy: [
-                    "That's wonderful to hear! I'm so glad everything is working smoothly for you...",
-                    "Fantastic! I love hearing success stories from our customers...",
-                    "That's music to my ears! Thank you for sharing the good news...",
-                    "I'm thrilled to hear that! Is there anything else I can help you with today?"
-                ]
-            };
-
-            // Conversation Memory
-            const conversationMemory = {
-                userContext: {},
-                previousIssues: [],
-                preferences: {},
-                sentimentHistory: []
-            };
-
-            // Initialize Support System
-            function initSupportSystem() {
-                loadConversationHistory();
-                assignRandomAgent();
-                showWelcomeMessage();
-                setupEventListeners();
-                setupAutoResponses();
-                checkForPendingTickets();
-            }
-
-            // Setup Event Listeners
-            function setupEventListeners() {
-                elements.supportToggle.addEventListener('click', toggleSupport);
-                elements.minimizeChat.addEventListener('click', minimizeSupport);
-                elements.closeChat.addEventListener('click', closeSupport);
-                elements.sendButton.addEventListener('click', sendMessage);
-                elements.supportInput.addEventListener('keypress', handleKeyPress);
-                elements.supportInput.addEventListener('input', handleInput);
-                
-                // Quick actions
-                elements.quickActions.addEventListener('click', handleQuickAction);
-                
-                // Ticket system
-                document.getElementById('cancelTicket').addEventListener('click', hideTicketSystem);
-                document.getElementById('submitTicket').addEventListener('click', submitTicket);
-                document.getElementById('backToChat').addEventListener('click', backToChat);
-                
-                // Auto-close when clicking outside (for mobile)
-                document.addEventListener('click', handleOutsideClick);
-                
-                // Check for inactivity
-                setInterval(checkInactivity, 60000);
-            }
-
-            // Toggle Support Window
-            function toggleSupport() {
-                state.isOpen = !state.isOpen;
-                elements.supportToggle.classList.toggle('active');
-                elements.supportContainer.classList.toggle('active');
-                
-                if (state.isOpen) {
-                    elements.supportInput.focus();
-                    state.unreadMessages = 0;
-                    updateNotificationBadge();
-                    updateLastInteraction();
-                    
-                    // Rotate agent for fresh conversation
-                    if (state.conversationHistory.length > 10) {
-                        assignRandomAgent();
-                    }
-                }
-            }
-
-            // Minimize Support
-            function minimizeSupport() {
-                state.isOpen = false;
-                elements.supportContainer.classList.remove('active');
-                elements.supportToggle.classList.remove('active');
-            }
-
-            // Close Support
-            function closeSupport() {
-                state.isOpen = false;
-                elements.supportContainer.classList.remove('active');
-                elements.supportToggle.classList.remove('active');
-                
-                // Save conversation
-                saveConversationHistory();
-            }
-
-            // Handle Key Press
-            function handleKeyPress(e) {
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get DOM elements
+        const supportToggle = document.getElementById('supportToggle');
+        const supportContainer = document.getElementById('supportContainer');
+        const minimizeChat = document.getElementById('minimizeChat');
+        const closeChat = document.getElementById('closeChat');
+        const supportInput = document.getElementById('supportInput');
+        const sendButton = document.getElementById('sendButton');
+        const supportMessages = document.getElementById('supportMessages');
+        const quickActions = document.getElementById('quickActions');
+        const ticketSystem = document.getElementById('ticketSystem');
+        const successState = document.getElementById('successState');
+        const notificationBadge = document.getElementById('notificationBadge');
+        
+        // State
+        let isOpen = false;
+        let isTyping = false;
+        let conversationHistory = [];
+        
+        // Initialize support system
+        function initSupportSystem() {
+            console.log('Support system initialized');
+            showWelcomeMessage();
+            setupEventListeners();
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Toggle support window
+            supportToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleSupport();
+            });
+            
+            // Minimize chat
+            minimizeChat.addEventListener('click', function(e) {
+                e.stopPropagation();
+                minimizeSupport();
+            });
+            
+            // Close chat
+            closeChat.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeSupport();
+            });
+            
+            // Send message
+            sendButton.addEventListener('click', sendMessage);
+            
+            // Enter key to send
+            supportInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
-            }
-
-            // Handle Input
-            function handleInput() {
-                // Auto-resize textarea
-                elements.supportInput.style.height = 'auto';
-                elements.supportInput.style.height = Math.min(elements.supportInput.scrollHeight, 120) + 'px';
-                
-                // Update last interaction
-                updateLastInteraction();
-            }
-
-            // Send Message
-            async function sendMessage() {
-                const message = elements.supportInput.value.trim();
-                if (!message || state.isTyping) return;
-                
-                // Add user message
-                addMessage('user', message);
-                elements.supportInput.value = '';
-                elements.supportInput.style.height = 'auto';
-                elements.sendButton.disabled = true;
-                
-                // Analyze sentiment
-                analyzeSentiment(message);
-                
-                // Show typing indicator
-                showTypingIndicator();
-                
-                // Generate AI response with realistic delays
-                const typingDelay = calculateTypingDelay(message.length);
-                const thinkingTime = 500 + Math.random() * 1500;
-                
-                setTimeout(async () => {
-                    const response = await generateIntelligentResponse(message);
-                    
-                    hideTypingIndicator();
-                    
-                    // Simulate typing out response
-                    typeResponse(response);
-                    
-                    elements.sendButton.disabled = false;
-                    elements.supportInput.focus();
-                }, typingDelay + thinkingTime);
-            }
-
-            // Add Message to Chat
-            function addMessage(sender, content, type = 'text') {
-                const messageDiv = document.createElement('div');
-                const timestamp = new Date();
-                const timeString = timestamp.toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-                
-                if (sender === 'bot') {
-                    messageDiv.className = 'message bot';
-                    messageDiv.innerHTML = `
-                        ${content}
-                        <span class="message-time">${timeString} • ${state.currentAgent.name}</span>
-                    `;
-                } else {
-                    messageDiv.className = 'message user';
-                    messageDiv.innerHTML = `
-                        ${content}
-                        <span class="message-time">${timeString}</span>
-                    `;
-                }
-                
-                elements.supportMessages.appendChild(messageDiv);
-                elements.supportMessages.scrollTop = elements.supportMessages.scrollHeight;
-                
-                // Add to conversation history
-                state.conversationHistory.push({
-                    sender,
-                    content,
-                    type,
-                    timestamp: timestamp.toISOString(),
-                    agent: sender === 'bot' ? state.currentAgent.name : null,
-                    sentiment: state.userSentiment
-                });
-                
-                // Update conversation memory
-                updateConversationMemory(sender, content);
-                
-                // Save conversation
-                saveConversationHistory();
-            }
-
-            // Show Typing Indicator
-            function showTypingIndicator() {
-                if (state.isTyping) return;
-                state.isTyping = true;
-                
-                const typingDiv = document.createElement('div');
-                typingDiv.className = 'typing-with-agent';
-                typingDiv.innerHTML = `
-                    <div class="typing-agent-avatar" style="background: ${state.currentAgent.color}">
-                        ${state.currentAgent.avatar}
-                    </div>
-                    <div class="message-typing">
-                        <span class="typing-text">${state.currentAgent.name} is typing</span>
-                        <div class="typing-dots">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </div>
-                `;
-                
-                elements.supportMessages.appendChild(typingDiv);
-                elements.supportMessages.scrollTop = elements.supportMessages.scrollHeight;
-            }
-
-            // Hide Typing Indicator
-            function hideTypingIndicator() {
-                state.isTyping = false;
-                const typingIndicator = elements.supportMessages.querySelector('.typing-with-agent');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-            }
-
-            // Type Response with Realistic Typing
-            function typeResponse(response) {
-                const words = response.split(' ');
-                let currentWord = 0;
-                let typedText = '';
-                
-                function typeNextWord() {
-                    if (currentWord < words.length) {
-                        typedText += (currentWord > 0 ? ' ' : '') + words[currentWord];
-                        addMessage('bot', typedText);
-                        currentWord++;
-                        
-                        // Vary typing speed for realism
-                        const wordLength = words[currentWord - 1]?.length || 0;
-                        const delay = Math.max(30, Math.min(120, wordLength * 10)) + Math.random() * 50;
-                        
-                        state.typingTimeout = setTimeout(typeNextWord, delay);
-                    } else {
-                        // Add slight pause after completion
-                        setTimeout(() => {
-                            suggestFollowUp(response);
-                        }, 500);
-                    }
-                }
-                
-                // Clear any existing typing
-                hideTypingIndicator();
-                
-                // Start typing
-                typeNextWord();
-            }
-
-            // Calculate Realistic Typing Delay
-            function calculateTypingDelay(messageLength) {
-                const baseDelay = 800;
-                const lengthDelay = messageLength * 15;
-                const randomDelay = Math.random() * 1000;
-                return baseDelay + lengthDelay + randomDelay;
-            }
-
-            // Generate Intelligent AI Response
-            async function generateIntelligentResponse(userMessage) {
-                try {
-                    // For production, use actual AI API
-                    // const aiResponse = await getAIResponseFromAPI(userMessage);
-                    // return aiResponse;
-                    
-                    // For demo, use our intelligent response system
-                    return generateContextualResponse(userMessage);
-                } catch (error) {
-                    console.error('AI Response Error:', error);
-                    return generateFallbackResponse(userMessage);
-                }
-            }
-
-            // Generate Contextual Response
-            function generateContextualResponse(userMessage) {
-                const lowerMessage = userMessage.toLowerCase();
-                const sentiment = state.userSentiment;
-                const agent = state.currentAgent;
-                
-                // Get emotional opening
-                const emotionalOpening = getEmotionalOpening(sentiment);
-                
-                // Check message intent
-                if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
-                    return `${emotionalOpening}You're very welcome! ${getRandom([
-                        "I'm glad I could help.",
-                        "Happy to be of assistance!",
-                        "It's my pleasure to help.",
-                        "That's what I'm here for! 😊"
-                    ])} ${getAgentSignoff(agent)}`;
-                }
-                
-                if (lowerMessage.includes('status') || lowerMessage.includes('where') || lowerMessage.includes('track')) {
-                    return `${emotionalOpening}${generateTransactionStatusResponse()}`;
-                }
-                
-                if (lowerMessage.includes('time') || lowerMessage.includes('how long') || lowerMessage.includes('wait')) {
-                    return `${emotionalOpening}${generateProcessingTimeResponse()}`;
-                }
-                
-                if (lowerMessage.includes('bonus') || lowerMessage.includes('+10%') || lowerMessage.includes('extra')) {
-                    return `${emotionalOpening}${generateBonusExplanation()}`;
-                }
-                
-                if (lowerMessage.includes('security') || lowerMessage.includes('safe') || lowerMessage.includes('trust')) {
-                    return `${emotionalOpening}${generateSecurityReassurance()}`;
-                }
-                
-                if (lowerMessage.includes('problem') || lowerMessage.includes('issue') || lowerMessage.includes('not work')) {
-                    return `${emotionalOpening}${generateProblemResolution()}`;
-                }
-                
-                // Default intelligent response
-                return `${emotionalOpening}${generateGeneralResponse(userMessage)}`;
-            }
-
-            // Generate Transaction Status Response
-            function generateTransactionStatusResponse() {
-                return `
-                    I understand you're checking on your transaction status. ${getRandom([
-                        "Let me explain how our tracking works...",
-                        "I'd be happy to help you track that down.",
-                        "I can see why you'd want an update on that."
-                    ])}
-                    
-                    <div class="info-card success">
-                        <div class="info-card-header">
-                            <div class="info-card-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <div class="info-card-title">How to Check Your Transaction</div>
-                        </div>
-                        <div class="info-card-content">
-                            <strong>Option 1:</strong> Check your email for the transaction confirmation<br>
-                            <strong>Option 2:</strong> Look for the transaction ID in your account<br>
-                            <strong>Option 3:</strong> Submit a ticket with your details for a manual check
-                        </div>
-                    </div>
-                    
-                    Most transactions complete within <strong>${CONFIG.PROCESSING_TIMES.normal}</strong>. If it's been longer, I recommend submitting a ticket so I can personally look into it for you.
-                    
-                    ${getRandom([
-                        "Would you like me to help you submit a ticket?",
-                        "Can you provide your transaction details so I can check?",
-                        "Shall we get this sorted out together?"
-                    ])}
-                `;
-            }
-
-            // Generate Processing Time Response
-            function generateProcessingTimeResponse() {
-                return `
-                    I completely understand wanting to know about processing times! ${getRandom([
-                        "It's one of our most common questions.",
-                        "Everyone wants to know when their funds will arrive.",
-                        "Timing is everything when it comes to transactions."
-                    ])}
-                    
-                    <div class="info-card">
-                        <div class="info-card-header">
-                            <div class="info-card-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="info-card-title">Realistic Processing Timeline</div>
-                        </div>
-                        <div class="info-card-content">
-                            <strong>🕒 0-5 minutes:</strong> Blockchain confirmation (network dependent)<br>
-                            <strong>✅ 1-2 minutes:</strong> Internal verification & amount check<br>
-                            <strong>🚀 2-3 minutes:</strong> PayPal payment initiation<br>
-                            <strong>💰 2-5 minutes:</strong> PayPal processing & delivery<br>
-                            <strong>📧 Instant:</strong> Email confirmation sent
-                        </div>
-                    </div>
-                    
-                    <div class="info-card warning">
-                        <div class="info-card-header">
-                            <div class="info-card-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="info-card-title">Why Times May Vary</div>
-                        </div>
-                        <div class="info-card-content">
-                            • Blockchain network congestion<br>
-                            • PayPal verification requirements<br>
-                            • Amount being exchanged (larger amounts have extra checks)<br>
-                            • Time of day (we're actually 24/7, but banks have hours)<br>
-                            • Security verification steps (for your protection)
-                        </div>
-                    </div>
-                    
-                    ${getRandom([
-                        "Rest assured, we're monitoring your transaction every step of the way.",
-                        "I'll personally keep an eye on it if you're concerned.",
-                        "Our automated systems are working round the clock to process transactions."
-                    ])}
-                `;
-            }
-
-            // Generate Bonus Explanation
-            function generateBonusExplanation() {
-                return `
-                    The +10% bonus is one of our favorite features to explain! ${getRandom([
-                        "It's what sets us apart from other exchanges.",
-                        "Our customers absolutely love this benefit.",
-                        "It's our way of giving back to our community."
-                    ])}
-                    
-                    <div class="info-card success">
-                        <div class="info-card-header">
-                            <div class="info-card-icon">
-                                <i class="fas fa-gift"></i>
-                            </div>
-                            <div class="info-card-title">How the +10% Bonus Works</div>
-                        </div>
-                        <div class="info-card-content">
-                            <strong>1.</strong> We check real-time market prices from 5+ exchanges<br>
-                            <strong>2.</strong> Take the best available rate<br>
-                            <strong>3.</strong> Add 10% on top of that rate<br>
-                            <strong>4.</strong> Apply it automatically to your transaction<br>
-                            <strong>5.</strong> Show you the exact amount in your summary
-                        </div>
-                    </div>
-                    
-                    <strong>Real Example:</strong><br>
-                    If you send $1,000 worth of Bitcoin, you receive $1,100 in PayPal funds. Yes, really! 💫
-                    
-                    ${getRandom([
-                        "It's completely transparent - no hidden catches.",
-                        "This bonus applies to every single transaction.",
-                        "We believe in providing real value to our customers."
-                    ])}
-                `;
-            }
-
-            // Generate Security Reassurance
-            function generateSecurityReassurance() {
-                return `
-                    Security is our absolute top priority. ${getRandom([
-                        "I take your security as seriously as I take my own.",
-                        "We've built this platform with security as the foundation.",
-                        "Your trust means everything to us."
-                    ])}
-                    
-                    <div class="info-card">
-                        <div class="info-card-header">
-                            <div class="info-card-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="info-card-title">Our Security Measures</div>
-                        </div>
-                        <div class="info-card-content">
-                            <strong>🔐 Multi-Signature Wallets:</strong> 3-of-5 signature requirement<br>
-                            <strong>❄️ Cold Storage:</strong> 95% of funds offline<br>
-                            <strong>🔒 SSL Encryption:</strong> Bank-grade 256-bit encryption<br>
-                            <strong>👥 KYC/AML:</strong> Full regulatory compliance<br>
-                            <strong>💰 Insurance:</strong> $1,000,000 coverage per transaction<br>
-                            <strong>🔍 Regular Audits:</strong> Monthly security reviews
-                        </div>
-                    </div>
-                    
-                    <div class="info-card success">
-                        <div class="info-card-header">
-                            <div class="info-card-icon">
-                                <i class="fas fa-user-shield"></i>
-                            </div>
-                            <div class="info-card-title">Your Role in Security</div>
-                        </div>
-                        <div class="info-card-content">
-                            • Never share your private keys<br>
-                            • Use unique passwords<br>
-                            • Enable 2FA when available<br>
-                            • Verify email confirmations<br>
-                            • Only use official channels
-                        </div>
-                    </div>
-                    
-                    ${getRandom([
-                        "We've processed millions in transactions with zero security incidents.",
-                        "Your funds are as safe with us as they are in a bank.",
-                        "Sleep well knowing your assets are protected."
-                    ])}
-                `;
-            }
-
-            // Get Emotional Opening
-            function getEmotionalOpening(sentiment) {
-                const openings = EMOTIONAL_RESPONSES[sentiment] || EMOTIONAL_RESPONSES.neutral;
-                return getRandom(openings) + ' ';
-            }
-
-            // Get Random Array Element
-            function getRandom(array) {
-                return array[Math.floor(Math.random() * array.length)];
-            }
-
-            // Get Agent Signoff
-            function getAgentSignoff(agent) {
-                const signoffs = [
-                    `I'm ${agent.name.split(' ')[0]}, by the way - here if you need anything else!`,
-                    `This is ${agent.name.split(' ')[0]} - don't hesitate to reach out again.`,
-                    `- ${agent.name.split(' ')[0]} 🤝`,
-                    `All the best, ${agent.name.split(' ')[0]}`
-                ];
-                return getRandom(signoffs);
-            }
-
-            // Initialize the system
-            initSupportSystem();
-
-            // Note: The complete system includes much more functionality including:
-            // - Actual AI API integration
-            // - Ticket management system
-            // - Email notifications
-            // - Database integration
-            // - Admin dashboard
-            // - Real-time updates
-            // - Performance analytics
-            // - Multi-language support
-            // - Escalation protocols
-            // - SLA monitoring
-            // - Customer satisfaction tracking
+            });
             
-            // This code provides a solid foundation that can be expanded for production use.
-
-        });
-    </script>
+            // Auto-resize textarea
+            supportInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+            
+            // Quick actions
+            quickActions.addEventListener('click', function(e) {
+                if (e.target.classList.contains('quick-action') || e.target.closest('.quick-action')) {
+                    const button = e.target.classList.contains('quick-action') ? e.target : e.target.closest('.quick-action');
+                    const action = button.dataset.action;
+                    handleQuickAction(action);
+                }
+            });
+            
+            // Ticket system buttons
+            document.getElementById('cancelTicket').addEventListener('click', hideTicketSystem);
+            document.getElementById('submitTicket').addEventListener('click', submitTicket);
+            document.getElementById('backToChat').addEventListener('click', backToChat);
+            
+            // Close when clicking outside (on mobile/desktop)
+            document.addEventListener('click', function(e) {
+                if (isOpen && !supportContainer.contains(e.target) && !supportToggle.contains(e.target)) {
+                    minimizeSupport();
+                }
+            });
+            
+            // Prevent clicks inside support container from closing it
+            supportContainer.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+        
+        // Toggle support window
+        function toggleSupport() {
+            isOpen = !isOpen;
+            supportToggle.classList.toggle('active');
+            supportContainer.classList.toggle('active');
+            
+            if (isOpen) {
+                console.log('Opening chat');
+                supportInput.focus();
+                updateNotificationBadge(0);
+                
+                // Show welcome message if no messages yet
+                if (conversationHistory.length === 0) {
+                    showWelcomeMessage();
+                }
+            } else {
+                console.log('Closing chat');
+            }
+        }
+        
+        // Minimize support
+        function minimizeSupport() {
+            isOpen = false;
+            supportContainer.classList.remove('active');
+            supportToggle.classList.remove('active');
+            console.log('Chat minimized');
+        }
+        
+        // Close support
+        function closeSupport() {
+            minimizeSupport();
+            console.log('Chat closed');
+        }
+        
+        // Send message
+        function sendMessage() {
+            const message = supportInput.value.trim();
+            if (!message || isTyping) return;
+            
+            // Add user message
+            addMessage('user', message);
+            supportInput.value = '';
+            supportInput.style.height = 'auto';
+            sendButton.disabled = true;
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Simulate bot response after delay
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = generateBotResponse(message);
+                addMessage('bot', response);
+                sendButton.disabled = false;
+                supportInput.focus();
+            }, 1000 + Math.random() * 1000);
+        }
+        
+        // Add message to chat
+        function addMessage(sender, content) {
+            const messageDiv = document.createElement('div');
+            const timestamp = new Date();
+            const timeString = timestamp.toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            if (sender === 'bot') {
+                messageDiv.className = 'message bot';
+                messageDiv.innerHTML = `
+                    ${content}
+                    <span class="message-time">${timeString} • Sarah Johnson</span>
+                `;
+            } else {
+                messageDiv.className = 'message user';
+                messageDiv.innerHTML = `
+                    ${content}
+                    <span class="message-time">${timeString}</span>
+                `;
+            }
+            
+            supportMessages.appendChild(messageDiv);
+            supportMessages.scrollTop = supportMessages.scrollHeight;
+            
+            // Add to conversation history
+            conversationHistory.push({
+                sender,
+                content,
+                timestamp: timestamp.toISOString()
+            });
+        }
+        
+        // Show typing indicator
+        function showTypingIndicator() {
+            if (isTyping) return;
+            isTyping = true;
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-with-agent';
+            typingDiv.innerHTML = `
+                <div class="typing-agent-avatar" style="background: #2563eb">
+                    👩‍💼
+                </div>
+                <div class="message-typing">
+                    <span class="typing-text">Sarah Johnson is typing</span>
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            
+            supportMessages.appendChild(typingDiv);
+            supportMessages.scrollTop = supportMessages.scrollHeight;
+        }
+        
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            isTyping = false;
+            const typingIndicator = supportMessages.querySelector('.typing-with-agent');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Generate bot response
+        function generateBotResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                return "Hello! 👋 I'm Sarah, your CryptoBridge support specialist. How can I help you today?";
+            }
+            
+            if (lowerMessage.includes('time') || lowerMessage.includes('how long')) {
+                return `Transactions typically process within 5-15 minutes, but can take up to 30 minutes during high volume periods. Is there a specific transaction you're concerned about?`;
+            }
+            
+            if (lowerMessage.includes('thank')) {
+                return "You're very welcome! 😊 Is there anything else I can help you with today?";
+            }
+            
+            if (lowerMessage.includes('bonus') || lowerMessage.includes('+10%')) {
+                return `The +10% bonus is our special offer! We add 10% extra to the market rate when you exchange with us. For example, if you send $100 worth of crypto, you'll receive $110 in your PayPal account. 🎉`;
+            }
+            
+            if (lowerMessage.includes('problem') || lowerMessage.includes('issue') || lowerMessage.includes('help')) {
+                return `I'm sorry to hear you're having issues. Let me help you with that. Could you provide more details about what's happening? Alternatively, you can click "Submit Ticket" below to create a support ticket.`;
+            }
+            
+            if (lowerMessage.includes('status') || lowerMessage.includes('where')) {
+                return `To check your transaction status, please check your email for the confirmation message. If you don't see it, you can submit a ticket with your details and I'll personally look into it for you.`;
+            }
+            
+            if (lowerMessage.includes('security') || lowerMessage.includes('safe')) {
+                return `CryptoBridge uses bank-grade security including SSL encryption, multi-signature wallets, and 95% cold storage. We're fully licensed and insured. Your funds are safe with us! 🔒`;
+            }
+            
+            // Default response
+            return `Thanks for your message! I understand you're asking about "${userMessage}". Could you provide a few more details so I can help you better? 😊`;
+        }
+        
+        // Show welcome message
+        function showWelcomeMessage() {
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'welcome-section';
+            welcomeDiv.innerHTML = `
+                <h3 style="margin-top: 0; color: #2563eb;">👋 Welcome to CryptoBridge Support!</h3>
+                <p style="margin-bottom: 10px;">Hello! I'm <strong>Sarah Johnson</strong>, your dedicated support specialist. I'm here to help you with:</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Transaction status & tracking</li>
+                    <li>Processing time questions</li>
+                    <li>The +10% bonus program</li>
+                    <li>Security & safety concerns</li>
+                    <li>Technical issues</li>
+                </ul>
+                <p style="margin-top: 10px; margin-bottom: 0;"><strong>How can I assist you today?</strong> 😊</p>
+            `;
+            
+            supportMessages.appendChild(welcomeDiv);
+            supportMessages.scrollTop = supportMessages.scrollHeight;
+        }
+        
+        // Handle quick actions
+        function handleQuickAction(action) {
+            console.log('Quick action:', action);
+            
+            let userMessage = '';
+            switch(action) {
+                case 'transaction-help':
+                    userMessage = "I need help with a transaction";
+                    break;
+                case 'payment-time':
+                    userMessage = "How long do payments take?";
+                    break;
+                case 'security-check':
+                    userMessage = "Is CryptoBridge secure?";
+                    break;
+                case 'submit-ticket':
+                    showTicketSystem();
+                    return;
+            }
+            
+            // Add user message
+            addMessage('user', userMessage);
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Generate and show response
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = generateBotResponse(userMessage);
+                addMessage('bot', response);
+            }, 800);
+        }
+        
+        // Show ticket system
+        function showTicketSystem() {
+            quickActions.style.display = 'none';
+            supportInputArea.style.display = 'none';
+            ticketSystem.classList.add('active');
+        }
+        
+        // Hide ticket system
+        function hideTicketSystem() {
+            ticketSystem.classList.remove('active');
+            quickActions.style.display = 'flex';
+            supportInputArea.style.display = 'block';
+        }
+        
+        // Submit ticket
+        function submitTicket() {
+            const email = document.getElementById('ticketEmail').value;
+            const wallet = document.getElementById('ticketWallet').value;
+            const message = document.getElementById('ticketMessage').value;
+            
+            if (!email || !wallet || !message) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Generate ticket ID
+            const ticketId = 'TICKET-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            document.getElementById('ticketIdDisplay').textContent = ticketId;
+            
+            // Show success state
+            ticketSystem.classList.remove('active');
+            successState.classList.add('active');
+        }
+        
+        // Back to chat from success state
+        function backToChat() {
+            successState.classList.remove('active');
+            quickActions.style.display = 'flex';
+            supportInputArea.style.display = 'block';
+            
+            // Clear form
+            document.getElementById('ticketEmail').value = '';
+            document.getElementById('ticketWallet').value = '';
+            document.getElementById('ticketMessage').value = '';
+        }
+        
+        // Update notification badge
+        function updateNotificationBadge(count) {
+            if (count > 0) {
+                notificationBadge.textContent = count;
+                notificationBadge.style.display = 'flex';
+            } else {
+                notificationBadge.style.display = 'none';
+            }
+        }
+        
+        // Start the system
+        initSupportSystem();
+        
+        // For demo purposes: Add a notification after 10 seconds if chat is closed
+        setTimeout(() => {
+            if (!isOpen) {
+                updateNotificationBadge(1);
+            }
+        }, 10000);
+    });
+</script>
 </body>
 </html>
