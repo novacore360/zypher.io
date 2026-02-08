@@ -3,116 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryptoBridge Live Support</title>
+    <title>CryptoBridge Professional Support</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Complete Realistic Support System */
+        /* Enhanced Mobile-First Design */
         :root {
-            --primary: #2563eb;
-            --primary-light: #3b82f6;
-            --primary-dark: #1d4ed8;
-            --success: #10b981;
-            --success-light: #34d399;
-            --warning: #f59e0b;
-            --warning-light: #fbbf24;
-            --error: #ef4444;
-            --background: #ffffff;
-            --surface: #f8fafc;
-            --border: #e2e8f0;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
+            --cryptobridge-primary: #2563eb;
+            --cryptobridge-primary-light: #3b82f6;
+            --cryptobridge-primary-dark: #1d4ed8;
+            --cryptobridge-success: #10b981;
+            --cryptobridge-success-light: #34d399;
+            --cryptobridge-warning: #f59e0b;
+            --cryptobridge-warning-light: #fbbf24;
+            --cryptobridge-error: #ef4444;
+            --cryptobridge-background: #ffffff;
+            --cryptobridge-surface: #f8fafc;
+            --cryptobridge-border: #e2e8f0;
+            --cryptobridge-text-primary: #1e293b;
+            --cryptobridge-text-secondary: #64748b;
+            --cryptobridge-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --cryptobridge-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --cryptobridge-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        .support-system {
+        .cryptobridge-support-system {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
-        /* Floating Chat Widget */
-        .floating-support {
+        /* Enhanced Floating Chat Widget for Mobile */
+        .cryptobridge-floating-support {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 20px;
+            right: 20px;
             z-index: 10000;
         }
 
-        .support-toggle {
-            width: 65px;
-            height: 65px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        @media (max-width: 768px) {
+            .cryptobridge-floating-support {
+                bottom: 16px;
+                right: 16px;
+                left: 16px;
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+
+        .cryptobridge-support-toggle {
+            width: 68px;
+            height: 68px;
+            background: var(--cryptobridge-gradient);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 26px;
+            font-size: 28px;
             cursor: pointer;
-            box-shadow: 0 10px 40px rgba(37, 99, 235, 0.4);
-            border: 3px solid white;
+            box-shadow: var(--cryptobridge-shadow-lg);
+            border: 4px solid rgba(255, 255, 255, 0.9);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
         }
 
-        .support-toggle:hover {
-            transform: scale(1.1) rotate(10deg);
-            box-shadow: 0 15px 50px rgba(37, 99, 235, 0.6);
+        .cryptobridge-support-toggle:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 20px 60px rgba(37, 99, 235, 0.5);
         }
 
-        .support-toggle.active {
+        .cryptobridge-support-toggle.active {
             transform: rotate(45deg);
-            background: linear-gradient(135deg, var(--warning), var(--warning-light));
+            background: linear-gradient(135deg, var(--cryptobridge-warning), var(--cryptobridge-warning-light));
         }
 
-        .notification-badge {
+        @media (max-width: 768px) {
+            .cryptobridge-support-toggle {
+                width: 62px;
+                height: 62px;
+                font-size: 26px;
+                border-width: 3px;
+            }
+        }
+
+        .cryptobridge-notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--error);
+            top: -6px;
+            right: -6px;
+            background: var(--cryptobridge-error);
             color: white;
             font-size: 12px;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            border: 2px solid white;
-            animation: pulse 2s infinite;
+            font-weight: 700;
+            border: 3px solid white;
+            animation: cryptobridge-pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        @keyframes cryptobridge-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        /* Support Container */
-        .support-container {
+        /* Enhanced Mobile-Friendly Container */
+        .cryptobridge-support-container {
             position: absolute;
-            bottom: 85px;
+            bottom: 90px;
             right: 0;
             width: 420px;
-            height: 680px;
-            background: var(--background);
+            max-width: calc(100vw - 32px);
+            height: 700px;
+            max-height: calc(100vh - 140px);
+            background: var(--cryptobridge-background);
             border-radius: 24px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            box-shadow: var(--cryptobridge-shadow-lg);
             display: none;
             flex-direction: column;
             overflow: hidden;
-            border: 1px solid var(--border);
+            border: 1px solid var(--cryptobridge-border);
             transform-origin: bottom right;
         }
 
-        .support-container.active {
-            display: flex;
-            animation: slideUpScale 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        @media (max-width: 768px) {
+            .cryptobridge-support-container {
+                width: 100%;
+                height: 85vh;
+                max-height: 85vh;
+                bottom: 84px;
+                right: 0;
+                left: 0;
+                margin: 0 auto;
+                border-radius: 20px 20px 0 0;
+            }
         }
 
-        @keyframes slideUpScale {
+        @media (max-width: 480px) {
+            .cryptobridge-support-container {
+                height: 90vh;
+                max-height: 90vh;
+            }
+        }
+
+        .cryptobridge-support-container.active {
+            display: flex;
+            animation: cryptobridge-slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes cryptobridge-slideUp {
             from {
                 opacity: 0;
-                transform: translateY(20px) scale(0.95);
+                transform: translateY(30px) scale(0.95);
             }
             to {
                 opacity: 1;
@@ -120,89 +164,116 @@
             }
         }
 
-        /* Header */
-        .support-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        /* Enhanced Mobile Header */
+        .cryptobridge-support-header {
+            background: var(--cryptobridge-gradient);
             color: white;
-            padding: 24px;
+            padding: 20px;
             display: flex;
             align-items: center;
             gap: 16px;
-            position: relative;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .agent-avatar {
-            width: 52px;
-            height: 52px;
+        @media (max-width: 768px) {
+            .cryptobridge-support-header {
+                padding: 16px;
+                gap: 12px;
+            }
+        }
+
+        .cryptobridge-agent-avatar {
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 24px;
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 3px solid rgba(255,255,255,0.3);
+            flex-shrink: 0;
         }
 
-        .agent-info h3 {
+        @media (max-width: 768px) {
+            .cryptobridge-agent-avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+        }
+
+        .cryptobridge-agent-info h3 {
             font-size: 18px;
             font-weight: 700;
             margin: 0;
             line-height: 1.3;
         }
 
-        .agent-info p {
+        .cryptobridge-agent-info p {
             font-size: 13px;
             opacity: 0.9;
             margin: 6px 0 0;
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .status-indicator {
+        .cryptobridge-status-indicator {
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .status-dot {
+        .cryptobridge-status-dot {
             width: 10px;
             height: 10px;
-            background: var(--success-light);
+            background: var(--cryptobridge-success-light);
             border-radius: 50%;
             position: relative;
+            flex-shrink: 0;
         }
 
-        .status-dot::after {
+        .cryptobridge-status-dot::after {
             content: '';
             position: absolute;
             width: 100%;
             height: 100%;
-            background: var(--success-light);
+            background: var(--cryptobridge-success-light);
             border-radius: 50%;
-            animation: ping 1.5s infinite;
+            animation: cryptobridge-ping 1.5s infinite;
         }
 
-        @keyframes ping {
+        @keyframes cryptobridge-ping {
             75%, 100% {
                 transform: scale(2);
                 opacity: 0;
             }
         }
 
-        .header-actions {
+        .cryptobridge-header-actions {
             margin-left: auto;
             display: flex;
             gap: 12px;
+            flex-shrink: 0;
         }
 
-        .header-action {
+        @media (max-width: 768px) {
+            .cryptobridge-header-actions {
+                gap: 8px;
+            }
+        }
+
+        .cryptobridge-header-action {
             background: rgba(255,255,255,0.15);
             border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
             color: white;
             cursor: pointer;
             display: flex;
@@ -210,35 +281,61 @@
             justify-content: center;
             transition: all 0.3s;
             font-size: 16px;
+            flex-shrink: 0;
         }
 
-        .header-action:hover {
+        @media (max-width: 768px) {
+            .cryptobridge-header-action {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                font-size: 14px;
+            }
+        }
+
+        .cryptobridge-header-action:hover {
             background: rgba(255,255,255,0.25);
             transform: translateY(-1px);
         }
 
-        /* Messages Area */
-        .support-messages {
+        /* Enhanced Messages Area for Mobile */
+        .cryptobridge-support-messages {
             flex: 1;
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
-            background: var(--surface);
+            background: var(--cryptobridge-surface);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
             position: relative;
+            min-height: 0;
         }
 
-        .welcome-section {
-            background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(37,99,235,0.05));
-            border: 1px solid rgba(37,99,235,0.2);
+        @media (max-width: 768px) {
+            .cryptobridge-support-messages {
+                padding: 16px;
+                gap: 12px;
+            }
+        }
+
+        .cryptobridge-welcome-section {
+            background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(37,99,235,0.03));
+            border: 1px solid rgba(37,99,235,0.15);
             border-radius: 18px;
             padding: 20px;
             margin-bottom: 10px;
-            animation: slideInLeft 0.5s ease;
+            animation: cryptobridge-slideInLeft 0.5s ease;
+            backdrop-filter: blur(10px);
         }
 
-        @keyframes slideInLeft {
+        @media (max-width: 768px) {
+            .cryptobridge-welcome-section {
+                padding: 16px;
+                margin-bottom: 8px;
+            }
+        }
+
+        @keyframes cryptobridge-slideInLeft {
             from {
                 opacity: 0;
                 transform: translateX(-20px);
@@ -249,18 +346,29 @@
             }
         }
 
-        .message {
+        .cryptobridge-message {
             max-width: 85%;
-            padding: 16px 20px;
+            padding: 16px 18px;
             border-radius: 22px;
             font-size: 14.5px;
             line-height: 1.5;
             position: relative;
-            animation: messageAppear 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            animation: cryptobridge-messageAppear 0.3s ease;
+            box-shadow: var(--cryptobridge-shadow);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        @keyframes messageAppear {
+        @media (max-width: 768px) {
+            .cryptobridge-message {
+                max-width: 90%;
+                padding: 14px 16px;
+                font-size: 14px;
+                line-height: 1.4;
+            }
+        }
+
+        @keyframes cryptobridge-messageAppear {
             from {
                 opacity: 0;
                 transform: translateY(10px) scale(0.95);
@@ -271,23 +379,23 @@
             }
         }
 
-        .message.bot {
+        .cryptobridge-message.bot {
             background: white;
-            border: 1px solid var(--border);
+            border: 1px solid var(--cryptobridge-border);
             border-bottom-left-radius: 8px;
             align-self: flex-start;
             margin-right: auto;
         }
 
-        .message.user {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        .cryptobridge-message.user {
+            background: var(--cryptobridge-gradient);
             color: white;
             border-bottom-right-radius: 8px;
             align-self: flex-end;
             margin-left: auto;
         }
 
-        .message-time {
+        .cryptobridge-message-time {
             font-size: 11px;
             opacity: 0.7;
             margin-top: 8px;
@@ -295,145 +403,178 @@
             font-weight: 500;
         }
 
-        .message-typing {
+        .cryptobridge-message-typing {
             display: flex;
             align-items: center;
             gap: 6px;
             padding: 16px 20px;
             background: white;
             border-radius: 22px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--cryptobridge-border);
             width: fit-content;
             border-bottom-left-radius: 8px;
             margin-bottom: 5px;
+            box-shadow: var(--cryptobridge-shadow);
         }
 
-        .typing-text {
+        .cryptobridge-typing-text {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: var(--cryptobridge-text-secondary);
             font-style: italic;
         }
 
-        .typing-dots {
+        .cryptobridge-typing-dots {
             display: flex;
             gap: 4px;
         }
 
-        .typing-dots span {
+        .cryptobridge-typing-dots span {
             width: 8px;
             height: 8px;
-            background: var(--text-secondary);
+            background: var(--cryptobridge-text-secondary);
             border-radius: 50%;
-            animation: typingBounce 1.4s infinite ease-in-out;
+            animation: cryptobridge-typingBounce 1.4s infinite ease-in-out;
         }
 
-        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .cryptobridge-typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .cryptobridge-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
 
-        @keyframes typingBounce {
+        @keyframes cryptobridge-typingBounce {
             0%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-6px); }
         }
 
-        /* Information Cards */
-        .info-card {
+        /* Enhanced Information Cards */
+        .cryptobridge-info-card {
             background: white;
-            border: 1px solid var(--border);
+            border: 1px solid var(--cryptobridge-border);
             border-radius: 16px;
             padding: 18px;
             margin: 8px 0;
-            border-left: 4px solid var(--primary);
+            border-left: 5px solid var(--cryptobridge-primary);
+            box-shadow: var(--cryptobridge-shadow);
         }
 
-        .info-card.success {
-            border-left-color: var(--success);
+        @media (max-width: 768px) {
+            .cryptobridge-info-card {
+                padding: 16px;
+                margin: 6px 0;
+                border-left-width: 4px;
+            }
+        }
+
+        .cryptobridge-info-card.success {
+            border-left-color: var(--cryptobridge-success);
             background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(16,185,129,0.02));
         }
 
-        .info-card.warning {
-            border-left-color: var(--warning);
+        .cryptobridge-info-card.warning {
+            border-left-color: var(--cryptobridge-warning);
             background: linear-gradient(135deg, rgba(245,158,11,0.05), rgba(245,158,11,0.02));
         }
 
-        .info-card-header {
+        .cryptobridge-info-card-header {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 8px;
         }
 
-        .info-card-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--primary);
-            border-radius: 8px;
+        .cryptobridge-info-card-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--cryptobridge-primary);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 14px;
+            flex-shrink: 0;
         }
 
-        .info-card.success .info-card-icon {
-            background: var(--success);
+        .cryptobridge-info-card.success .cryptobridge-info-card-icon {
+            background: var(--cryptobridge-success);
         }
 
-        .info-card.warning .info-card-icon {
-            background: var(--warning);
+        .cryptobridge-info-card.warning .cryptobridge-info-card-icon {
+            background: var(--cryptobridge-warning);
         }
 
-        .info-card-title {
+        .cryptobridge-info-card-title {
             font-weight: 700;
             font-size: 15px;
-            color: var(--text-primary);
+            color: var(--cryptobridge-text-primary);
         }
 
-        .info-card-content {
+        .cryptobridge-info-card-content {
             font-size: 13.5px;
-            color: var(--text-secondary);
+            color: var(--cryptobridge-text-secondary);
             line-height: 1.5;
         }
 
-        /* Input Area */
-        .support-input-area {
-            padding: 20px;
+        /* Enhanced Input Area for Mobile */
+        .cryptobridge-support-input-area {
+            padding: 16px;
             background: white;
-            border-top: 1px solid var(--border);
-            position: relative;
+            border-top: 1px solid var(--cryptobridge-border);
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
         }
 
-        .input-container {
+        @media (max-width: 768px) {
+            .cryptobridge-support-input-area {
+                padding: 12px 16px;
+            }
+        }
+
+        .cryptobridge-input-container {
             display: flex;
             gap: 12px;
             align-items: flex-end;
         }
 
-        .support-input {
+        @media (max-width: 768px) {
+            .cryptobridge-input-container {
+                gap: 10px;
+            }
+        }
+
+        .cryptobridge-support-input {
             flex: 1;
-            padding: 16px 20px;
-            border: 2px solid var(--border);
+            padding: 14px 18px;
+            border: 2px solid var(--cryptobridge-border);
             border-radius: 16px;
             font-size: 14.5px;
             line-height: 1.5;
             outline: none;
             transition: all 0.3s;
-            background: var(--surface);
+            background: var(--cryptobridge-surface);
             resize: none;
-            min-height: 52px;
-            max-height: 120px;
+            min-height: 50px;
+            max-height: 100px;
             font-family: inherit;
         }
 
-        .support-input:focus {
-            border-color: var(--primary);
+        @media (max-width: 768px) {
+            .cryptobridge-support-input {
+                padding: 12px 16px;
+                font-size: 14px;
+                min-height: 48px;
+            }
+        }
+
+        .cryptobridge-support-input:focus {
+            border-color: var(--cryptobridge-primary);
             background: white;
             box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
         }
 
-        .send-button {
+        .cryptobridge-send-button {
             width: 52px;
             height: 52px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: var(--cryptobridge-gradient);
             border: none;
             border-radius: 16px;
             color: white;
@@ -446,33 +587,53 @@
             flex-shrink: 0;
         }
 
-        .send-button:hover:not(:disabled) {
+        @media (max-width: 768px) {
+            .cryptobridge-send-button {
+                width: 48px;
+                height: 48px;
+                border-radius: 14px;
+                font-size: 16px;
+            }
+        }
+
+        .cryptobridge-send-button:hover:not(:disabled) {
             transform: translateY(-2px) scale(1.05);
             box-shadow: 0 8px 25px rgba(37,99,235,0.3);
         }
 
-        .send-button:disabled {
+        .cryptobridge-send-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none !important;
         }
 
-        /* Quick Actions */
-        .quick-actions {
+        /* Enhanced Quick Actions for Mobile */
+        .cryptobridge-quick-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            padding: 0 20px 20px;
+            padding: 16px;
             background: white;
+            border-top: 1px solid var(--cryptobridge-border);
+            max-height: 120px;
+            overflow-y: auto;
         }
 
-        .quick-action {
-            padding: 10px 18px;
-            background: var(--surface);
-            border: 1px solid var(--border);
+        @media (max-width: 768px) {
+            .cryptobridge-quick-actions {
+                padding: 12px 16px;
+                gap: 8px;
+                max-height: 110px;
+            }
+        }
+
+        .cryptobridge-quick-action {
+            padding: 10px 16px;
+            background: var(--cryptobridge-surface);
+            border: 1px solid var(--cryptobridge-border);
             border-radius: 14px;
-            font-size: 13.5px;
-            color: var(--text-primary);
+            font-size: 13px;
+            color: var(--cryptobridge-text-primary);
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
@@ -480,82 +641,95 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
 
-        .quick-action:hover {
+        @media (max-width: 768px) {
+            .cryptobridge-quick-action {
+                padding: 8px 14px;
+                font-size: 12.5px;
+                gap: 6px;
+            }
+        }
+
+        .cryptobridge-quick-action:hover {
             background: white;
-            border-color: var(--primary);
-            color: var(--primary);
+            border-color: var(--cryptobridge-primary);
+            color: var(--cryptobridge-primary);
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(37,99,235,0.1);
         }
 
-        .quick-action i {
+        .cryptobridge-quick-action i {
             font-size: 12px;
         }
 
-        /* Ticket System */
-        .ticket-system {
+        /* Enhanced Ticket System */
+        .cryptobridge-ticket-system {
             padding: 20px;
             background: white;
             display: none;
             flex-direction: column;
             gap: 16px;
-            animation: fadeIn 0.3s ease;
+            animation: cryptobridge-fadeIn 0.3s ease;
+            overflow-y: auto;
+            flex: 1;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        @media (max-width: 768px) {
+            .cryptobridge-ticket-system {
+                padding: 16px;
+                gap: 14px;
+            }
         }
 
-        .ticket-system.active {
+        .cryptobridge-ticket-system.active {
             display: flex;
         }
 
-        .form-group {
+        .cryptobridge-form-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        .form-label {
+        .cryptobridge-form-label {
             font-size: 13.5px;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--cryptobridge-text-primary);
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .form-label i {
-            color: var(--primary);
+        .cryptobridge-form-label i {
+            color: var(--cryptobridge-primary);
             font-size: 12px;
         }
 
-        .form-input {
+        .cryptobridge-form-input {
             padding: 14px 16px;
-            border: 2px solid var(--border);
+            border: 2px solid var(--cryptobridge-border);
             border-radius: 12px;
             font-size: 14px;
             outline: none;
             transition: all 0.3s;
-            background: var(--surface);
+            background: var(--cryptobridge-surface);
         }
 
-        .form-input:focus {
-            border-color: var(--primary);
+        .cryptobridge-form-input:focus {
+            border-color: var(--cryptobridge-primary);
             background: white;
             box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
         }
 
-        .form-actions {
+        .cryptobridge-form-actions {
             display: flex;
             gap: 12px;
             margin-top: 10px;
         }
 
-        .form-button {
+        .cryptobridge-form-button {
             flex: 1;
             padding: 14px;
             border: none;
@@ -570,43 +744,52 @@
             gap: 8px;
         }
 
-        .form-button.primary {
-            background: linear-gradient(135deg, var(--success), var(--success-light));
+        .cryptobridge-form-button.primary {
+            background: linear-gradient(135deg, var(--cryptobridge-success), var(--cryptobridge-success-light));
             color: white;
         }
 
-        .form-button.primary:hover {
+        .cryptobridge-form-button.primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(16,185,129,0.3);
         }
 
-        .form-button.secondary {
-            background: var(--surface);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
+        .cryptobridge-form-button.secondary {
+            background: var(--cryptobridge-surface);
+            color: var(--cryptobridge-text-secondary);
+            border: 1px solid var(--cryptobridge-border);
         }
 
-        .form-button.secondary:hover {
+        .cryptobridge-form-button.secondary:hover {
             background: white;
-            border-color: var(--border);
-            color: var(--text-primary);
+            border-color: var(--cryptobridge-border);
+            color: var(--cryptobridge-text-primary);
         }
 
-        /* Success States */
-        .success-state {
+        /* Enhanced Success State */
+        .cryptobridge-success-state {
             display: none;
             flex-direction: column;
             align-items: center;
-            padding: 40px 24px;
+            padding: 30px 20px;
             text-align: center;
+            background: white;
+            flex: 1;
+            overflow-y: auto;
         }
 
-        .success-state.active {
+        @media (max-width: 768px) {
+            .cryptobridge-success-state {
+                padding: 24px 16px;
+            }
+        }
+
+        .cryptobridge-success-state.active {
             display: flex;
-            animation: fadeInUp 0.5s ease;
+            animation: cryptobridge-fadeInUp 0.5s ease;
         }
 
-        @keyframes fadeInUp {
+        @keyframes cryptobridge-fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -617,10 +800,10 @@
             }
         }
 
-        .success-icon {
+        .cryptobridge-success-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, var(--success), var(--success-light));
+            background: linear-gradient(135deg, var(--cryptobridge-success), var(--cryptobridge-success-light));
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -631,44 +814,63 @@
             box-shadow: 0 10px 30px rgba(16,185,129,0.3);
         }
 
-        .success-content h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--text-primary);
+        @media (max-width: 768px) {
+            .cryptobridge-success-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 32px;
+                margin-bottom: 16px;
+            }
         }
 
-        .success-content p {
+        .cryptobridge-success-content h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--cryptobridge-text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .cryptobridge-success-content h3 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+        }
+
+        .cryptobridge-success-content p {
             font-size: 14.5px;
-            color: var(--text-secondary);
+            color: var(--cryptobridge-text-secondary);
             line-height: 1.6;
             margin-bottom: 20px;
         }
 
-        .ticket-id {
-            background: var(--surface);
-            border: 1px solid var(--border);
+        .cryptobridge-ticket-id {
+            background: var(--cryptobridge-surface);
+            border: 1px solid var(--cryptobridge-border);
             border-radius: 12px;
             padding: 12px 20px;
-            font-family: 'SF Mono', monospace;
+            font-family: 'SF Mono', 'Roboto Mono', monospace;
             font-size: 13px;
-            color: var(--text-primary);
+            color: var(--cryptobridge-text-primary);
             margin: 10px 0;
             font-weight: 600;
+            width: 100%;
+            max-width: 300px;
+            word-break: break-all;
         }
 
-        /* Typing Indicator with Agent Info */
-        .typing-with-agent {
+        /* Typing Indicator */
+        .cryptobridge-typing-with-agent {
             display: flex;
             align-items: center;
             gap: 12px;
             margin-bottom: 10px;
         }
 
-        .typing-agent-avatar {
+        .cryptobridge-typing-agent-avatar {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            background: var(--cryptobridge-gradient);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -678,217 +880,228 @@
             flex-shrink: 0;
         }
 
-        /* Emotional Tone Indicators */
-        .empathy-indicator {
-            display: inline-block;
-            margin-right: 6px;
-            font-size: 16px;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 500px) {
-            .floating-support {
-                bottom: 20px;
-                right: 20px;
+        /* Enhanced Mobile Responsive Design */
+        @media (max-width: 380px) {
+            .cryptobridge-support-container {
+                height: 92vh;
+                max-height: 92vh;
             }
-
-            .support-container {
-                width: calc(100vw - 40px);
-                height: 80vh;
-                right: 10px;
+            
+            .cryptobridge-quick-actions {
+                flex-direction: column;
+                max-height: 140px;
             }
-
-            .support-toggle {
-                width: 60px;
-                height: 60px;
-                font-size: 24px;
+            
+            .cryptobridge-quick-action {
+                width: 100%;
+                justify-content: center;
             }
         }
 
-        /* Dark Mode */
+        /* Enhanced Dark Mode */
         @media (prefers-color-scheme: dark) {
             :root {
-                --background: #1e293b;
-                --surface: #0f172a;
-                --border: #334155;
-                --text-primary: #f1f5f9;
-                --text-secondary: #cbd5e1;
+                --cryptobridge-background: #1e293b;
+                --cryptobridge-surface: #0f172a;
+                --cryptobridge-border: #334155;
+                --cryptobridge-text-primary: #f1f5f9;
+                --cryptobridge-text-secondary: #cbd5e1;
             }
 
-            .support-container {
-                background: var(--background);
-                border-color: var(--border);
+            .cryptobridge-support-container {
+                background: var(--cryptobridge-background);
+                border-color: var(--cryptobridge-border);
             }
 
-            .support-messages {
-                background: var(--surface);
+            .cryptobridge-support-messages {
+                background: var(--cryptobridge-surface);
             }
 
-            .message.bot {
+            .cryptobridge-message.bot {
                 background: #334155;
                 border-color: #475569;
             }
 
-            .message-typing {
+            .cryptobridge-message-typing {
                 background: #334155;
                 border-color: #475569;
             }
 
-            .info-card {
+            .cryptobridge-info-card {
                 background: #334155;
                 border-color: #475569;
             }
 
-            .support-input-area,
-            .quick-actions,
-            .ticket-system {
-                background: var(--background);
-                border-color: var(--border);
+            .cryptobridge-support-input-area,
+            .cryptobridge-quick-actions,
+            .cryptobridge-ticket-system,
+            .cryptobridge-success-state {
+                background: var(--cryptobridge-background);
+                border-color: var(--cryptobridge-border);
             }
 
-            .support-input,
-            .form-input {
-                background: var(--surface);
-                border-color: var(--border);
-                color: var(--text-primary);
+            .cryptobridge-support-input,
+            .cryptobridge-form-input {
+                background: var(--cryptobridge-surface);
+                border-color: var(--cryptobridge-border);
+                color: var(--cryptobridge-text-primary);
             }
 
-            .quick-action {
+            .cryptobridge-quick-action {
                 background: #334155;
                 border-color: #475569;
-                color: var(--text-primary);
+                color: var(--cryptobridge-text-primary);
             }
 
-            .quick-action:hover {
+            .cryptobridge-quick-action:hover {
                 background: #475569;
-                border-color: var(--primary);
+                border-color: var(--cryptobridge-primary);
             }
 
-            .ticket-id {
+            .cryptobridge-ticket-id {
                 background: #334155;
                 border-color: #475569;
-                color: var(--text-primary);
+                color: var(--cryptobridge-text-primary);
             }
+        }
+
+        /* Scrollbar Styling */
+        .cryptobridge-support-messages::-webkit-scrollbar,
+        .cryptobridge-quick-actions::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .cryptobridge-support-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cryptobridge-support-messages::-webkit-scrollbar-thumb {
+            background: var(--cryptobridge-border);
+            border-radius: 3px;
+        }
+
+        .cryptobridge-support-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--cryptobridge-text-secondary);
         }
     </style>
 </head>
 <body>
-    <div class="support-system">
-        <!-- Floating Support Button -->
-        <div class="floating-support">
-            <div class="support-toggle" id="supportToggle">
+    <div class="cryptobridge-support-system">
+        <!-- Enhanced Floating Support Button -->
+        <div class="cryptobridge-floating-support">
+            <div class="cryptobridge-support-toggle" id="cryptobridgeSupportToggle">
                 <i class="fas fa-headset"></i>
-                <div class="notification-badge" id="notificationBadge" style="display: none;">1</div>
+                <div class="cryptobridge-notification-badge" id="cryptobridgeNotificationBadge" style="display: none;">1</div>
             </div>
 
-            <!-- Support Container -->
-            <div class="support-container" id="supportContainer">
-                <!-- Header -->
-                <div class="support-header">
-                    <div class="agent-avatar" id="agentAvatar">
+            <!-- Enhanced Support Container -->
+            <div class="cryptobridge-support-container" id="cryptobridgeSupportContainer">
+                <!-- Enhanced Header -->
+                <div class="cryptobridge-support-header">
+                    <div class="cryptobridge-agent-avatar" id="cryptobridgeAgentAvatar">
                         <i class="fas fa-user-tie"></i>
                     </div>
-                    <div class="agent-info">
-                        <h3 id="agentName">Sarah Johnson</h3>
+                    <div class="cryptobridge-agent-info">
+                        <h3 id="cryptobridgeAgentName">Sarah Johnson</h3>
                         <p>
-                            <span class="status-indicator">
-                                <span class="status-dot"></span>
+                            <span class="cryptobridge-status-indicator">
+                                <span class="cryptobridge-status-dot"></span>
                                 <span>Live Support • Online Now</span>
                             </span>
                         </p>
                     </div>
-                    <div class="header-actions">
-                        <button class="header-action" id="minimizeChat" title="Minimize">
+                    <div class="cryptobridge-header-actions">
+                        <button class="cryptobridge-header-action" id="cryptobridgeMinimizeChat" title="Minimize">
                             <i class="fas fa-minus"></i>
                         </button>
-                        <button class="header-action" id="closeChat" title="Close">
+                        <button class="cryptobridge-header-action" id="cryptobridgeCloseChat" title="Close">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Messages Area -->
-                <div class="support-messages" id="supportMessages">
+                <!-- Enhanced Messages Area -->
+                <div class="cryptobridge-support-messages" id="cryptobridgeSupportMessages">
                     <!-- Messages load here -->
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="quick-actions" id="quickActions">
-                    <button class="quick-action" data-action="transaction-help">
+                <!-- Enhanced Quick Actions -->
+                <div class="cryptobridge-quick-actions" id="cryptobridgeQuickActions">
+                    <button class="cryptobridge-quick-action" data-action="transaction-help">
                         <i class="fas fa-exchange-alt"></i> Transaction Help
                     </button>
-                    <button class="quick-action" data-action="payment-time">
+                    <button class="cryptobridge-quick-action" data-action="payment-time">
                         <i class="fas fa-clock"></i> Processing Time
                     </button>
-                    <button class="quick-action" data-action="security-check">
+                    <button class="cryptobridge-quick-action" data-action="security-check">
                         <i class="fas fa-shield-alt"></i> Security Check
                     </button>
-                    <button class="quick-action" data-action="submit-ticket">
+                    <button class="cryptobridge-quick-action" data-action="submit-ticket">
                         <i class="fas fa-ticket-alt"></i> Submit Ticket
                     </button>
                 </div>
 
-                <!-- Input Area -->
-                <div class="support-input-area" id="supportInputArea">
-                    <div class="input-container">
-                        <textarea class="support-input" id="supportInput" 
+                <!-- Enhanced Input Area -->
+                <div class="cryptobridge-support-input-area" id="cryptobridgeSupportInputArea">
+                    <div class="cryptobridge-input-container">
+                        <textarea class="cryptobridge-support-input" id="cryptobridgeSupportInput" 
                                   placeholder="Type your message here... We're here to help 24/7 🚀" 
                                   rows="1"></textarea>
-                        <button class="send-button" id="sendButton">
+                        <button class="cryptobridge-send-button" id="cryptobridgeSendButton">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Ticket System -->
-                <div class="ticket-system" id="ticketSystem">
-                    <div class="form-group">
-                        <label class="form-label">
+                <!-- Enhanced Ticket System -->
+                <div class="cryptobridge-ticket-system" id="cryptobridgeTicketSystem">
+                    <div class="cryptobridge-form-group">
+                        <label class="cryptobridge-form-label">
                             <i class="fas fa-envelope"></i> Your PayPal Email
                         </label>
-                        <input type="email" class="form-input" id="ticketEmail" 
+                        <input type="email" class="cryptobridge-form-input" id="cryptobridgeTicketEmail" 
                                placeholder="your.email@example.com" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">
+                    <div class="cryptobridge-form-group">
+                        <label class="cryptobridge-form-label">
                             <i class="fas fa-wallet"></i> Wallet Address Used
                         </label>
-                        <input type="text" class="form-input" id="ticketWallet" 
+                        <input type="text" class="cryptobridge-form-input" id="cryptobridgeTicketWallet" 
                                placeholder="0x... or bc1..." required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">
+                    <div class="cryptobridge-form-group">
+                        <label class="cryptobridge-form-label">
                             <i class="fas fa-comment-dots"></i> What happened?
                         </label>
-                        <textarea class="form-input" id="ticketMessage" 
+                        <textarea class="cryptobridge-form-input" id="cryptobridgeTicketMessage" 
                                   placeholder="Please describe the issue in detail. The more information you provide, the better we can help! 😊"
                                   rows="3"></textarea>
                     </div>
-                    <div class="form-actions">
-                        <button class="form-button secondary" id="cancelTicket">
+                    <div class="cryptobridge-form-actions">
+                        <button class="cryptobridge-form-button secondary" id="cryptobridgeCancelTicket">
                             <i class="fas fa-arrow-left"></i> Back to Chat
                         </button>
-                        <button class="form-button primary" id="submitTicket">
+                        <button class="cryptobridge-form-button primary" id="cryptobridgeSubmitTicket">
                             <i class="fas fa-paper-plane"></i> Submit Ticket
                         </button>
                     </div>
                 </div>
 
-                <!-- Success State -->
-                <div class="success-state" id="successState">
-                    <div class="success-icon">
+                <!-- Enhanced Success State -->
+                <div class="cryptobridge-success-state" id="cryptobridgeSuccessState">
+                    <div class="cryptobridge-success-icon">
                         <i class="fas fa-check"></i>
                     </div>
-                    <div class="success-content">
+                    <div class="cryptobridge-success-content">
                         <h3>Ticket Submitted Successfully! 🎉</h3>
                         <p>Your support ticket has been received and is being processed by our team.</p>
-                        <div class="ticket-id" id="ticketIdDisplay">TICKET-XXXXXXXX</div>
+                        <div class="cryptobridge-ticket-id" id="cryptobridgeTicketIdDisplay">TICKET-XXXXXXXX</div>
                         <p><strong>What happens next:</strong><br>
                         1. Immediate review by our specialists<br>
                         2. Blockchain verification check<br>
                         3. Personal email update within 15 minutes<br>
                         4. Resolution typically within 1-2 hours</p>
-                        <button class="form-button secondary" id="backToChat">
+                        <button class="cryptobridge-form-button secondary" id="cryptobridgeBackToChat">
                             <i class="fas fa-comments"></i> Back to Chat
                         </button>
                     </div>
@@ -897,380 +1110,645 @@
         </div>
     </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get DOM elements
-        const supportToggle = document.getElementById('supportToggle');
-        const supportContainer = document.getElementById('supportContainer');
-        const minimizeChat = document.getElementById('minimizeChat');
-        const closeChat = document.getElementById('closeChat');
-        const supportInput = document.getElementById('supportInput');
-        const sendButton = document.getElementById('sendButton');
-        const supportMessages = document.getElementById('supportMessages');
-        const quickActions = document.getElementById('quickActions');
-        const ticketSystem = document.getElementById('ticketSystem');
-        const successState = document.getElementById('successState');
-        const notificationBadge = document.getElementById('notificationBadge');
-        
-        // State
-        let isOpen = false;
-        let isTyping = false;
-        let conversationHistory = [];
-        
-        // Initialize support system
-        function initSupportSystem() {
-            console.log('Support system initialized');
-            showWelcomeMessage();
-            setupEventListeners();
-        }
-        
-        // Setup event listeners
-        function setupEventListeners() {
-            // Toggle support window
-            supportToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                toggleSupport();
-            });
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enhanced DOM elements with unique names
+            const cryptobridgeSupportToggle = document.getElementById('cryptobridgeSupportToggle');
+            const cryptobridgeSupportContainer = document.getElementById('cryptobridgeSupportContainer');
+            const cryptobridgeMinimizeChat = document.getElementById('cryptobridgeMinimizeChat');
+            const cryptobridgeCloseChat = document.getElementById('cryptobridgeCloseChat');
+            const cryptobridgeSupportInput = document.getElementById('cryptobridgeSupportInput');
+            const cryptobridgeSendButton = document.getElementById('cryptobridgeSendButton');
+            const cryptobridgeSupportMessages = document.getElementById('cryptobridgeSupportMessages');
+            const cryptobridgeQuickActions = document.getElementById('cryptobridgeQuickActions');
+            const cryptobridgeTicketSystem = document.getElementById('cryptobridgeTicketSystem');
+            const cryptobridgeSuccessState = document.getElementById('cryptobridgeSuccessState');
+            const cryptobridgeNotificationBadge = document.getElementById('cryptobridgeNotificationBadge');
             
-            // Minimize chat
-            minimizeChat.addEventListener('click', function(e) {
-                e.stopPropagation();
-                minimizeSupport();
-            });
+            // Enhanced state management
+            let cryptobridgeIsOpen = false;
+            let cryptobridgeIsTyping = false;
+            let cryptobridgeConversationHistory = [];
+            let cryptobridgeHasShownWelcome = false;
             
-            // Close chat
-            closeChat.addEventListener('click', function(e) {
-                e.stopPropagation();
-                closeSupport();
-            });
+            // AI Integration Configuration
+            const CRYPTOBRIDGE_AI_CONFIG = {
+                apiKey: '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', // Replace with your API key
+                endpoint: 'https://api.openai.com/v1/chat/completions',
+                model: 'gpt-4',
+                temperature: 0.7,
+                maxTokens: 500
+            };
             
-            // Send message
-            sendButton.addEventListener('click', sendMessage);
+            // Professional AI Responses Knowledge Base
+            const CRYPTOBRIDGE_KNOWLEDGE_BASE = {
+                companyInfo: "CryptoBridge is a licensed cryptocurrency exchange platform offering secure crypto-to-PayPal transactions with a +10% bonus program.",
+                processingTimes: {
+                    standard: "15-30 minutes",
+                    priority: "5-15 minutes",
+                    blockchainConfirmations: "3 confirmations required (approx. 30 minutes)"
+                },
+                securityFeatures: [
+                    "Bank-grade SSL encryption",
+                    "Multi-signature wallet technology",
+                    "95% cold storage for assets",
+                    "Two-factor authentication (2FA)",
+                    "Regular security audits",
+                    "FDIC insured for USD balances"
+                ],
+                bonusProgram: "The +10% bonus program adds 10% extra to the market rate. Send $100 crypto, receive $110 in PayPal. Minimum: $50, Maximum: $10,000 daily.",
+                supportedCryptos: ["Bitcoin (BTC)", "Ethereum (ETH)", "Litecoin (LTC)", "Bitcoin Cash (BCH)", "USDT", "USDC"],
+                fees: "Transaction fee: 1% (minimum $2). No hidden fees. Bonus covers network fees."
+            };
             
-            // Enter key to send
-            supportInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
+            // Initialize enhanced support system
+            function cryptobridgeInitSupportSystem() {
+                console.log('CryptoBridge Professional Support System Initialized');
+                cryptobridgeSetupEventListeners();
+            }
             
-            // Auto-resize textarea
-            supportInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-            });
-            
-            // Quick actions
-            quickActions.addEventListener('click', function(e) {
-                if (e.target.classList.contains('quick-action') || e.target.closest('.quick-action')) {
-                    const button = e.target.classList.contains('quick-action') ? e.target : e.target.closest('.quick-action');
-                    const action = button.dataset.action;
-                    handleQuickAction(action);
-                }
-            });
-            
-            // Ticket system buttons
-            document.getElementById('cancelTicket').addEventListener('click', hideTicketSystem);
-            document.getElementById('submitTicket').addEventListener('click', submitTicket);
-            document.getElementById('backToChat').addEventListener('click', backToChat);
-            
-            // Close when clicking outside (on mobile/desktop)
-            document.addEventListener('click', function(e) {
-                if (isOpen && !supportContainer.contains(e.target) && !supportToggle.contains(e.target)) {
-                    minimizeSupport();
-                }
-            });
-            
-            // Prevent clicks inside support container from closing it
-            supportContainer.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-        
-        // Toggle support window
-        function toggleSupport() {
-            isOpen = !isOpen;
-            supportToggle.classList.toggle('active');
-            supportContainer.classList.toggle('active');
-            
-            if (isOpen) {
-                console.log('Opening chat');
-                supportInput.focus();
-                updateNotificationBadge(0);
+            // Enhanced event listeners setup
+            function cryptobridgeSetupEventListeners() {
+                // Toggle support window
+                cryptobridgeSupportToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    cryptobridgeToggleSupport();
+                });
                 
-                // Show welcome message if no messages yet
-                if (conversationHistory.length === 0) {
-                    showWelcomeMessage();
+                // Minimize chat
+                cryptobridgeMinimizeChat.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    cryptobridgeMinimizeSupport();
+                });
+                
+                // Close chat
+                cryptobridgeCloseChat.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    cryptobridgeCloseSupport();
+                });
+                
+                // Send message
+                cryptobridgeSendButton.addEventListener('click', cryptobridgeSendMessage);
+                
+                // Enhanced enter key handling
+                cryptobridgeSupportInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!cryptobridgeIsTyping) {
+                            cryptobridgeSendMessage();
+                        }
+                    }
+                });
+                
+                // Enhanced auto-resize textarea with mobile optimization
+                cryptobridgeSupportInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    const maxHeight = window.innerWidth < 768 ? 80 : 120;
+                    this.style.height = Math.min(this.scrollHeight, maxHeight) + 'px';
+                });
+                
+                // Quick actions with touch optimization
+                cryptobridgeQuickActions.addEventListener('click', function(e) {
+                    const quickAction = e.target.closest('.cryptobridge-quick-action');
+                    if (quickAction) {
+                        const action = quickAction.dataset.action;
+                        cryptobridgeHandleQuickAction(action);
+                    }
+                });
+                
+                // Enhanced touch events for mobile
+                cryptobridgeQuickActions.addEventListener('touchstart', function(e) {
+                    const quickAction = e.target.closest('.cryptobridge-quick-action');
+                    if (quickAction) {
+                        quickAction.style.transform = 'translateY(-1px)';
+                    }
+                }, { passive: true });
+                
+                cryptobridgeQuickActions.addEventListener('touchend', function(e) {
+                    const quickAction = e.target.closest('.cryptobridge-quick-action');
+                    if (quickAction) {
+                        quickAction.style.transform = '';
+                    }
+                }, { passive: true });
+                
+                // Ticket system buttons
+                document.getElementById('cryptobridgeCancelTicket').addEventListener('click', cryptobridgeHideTicketSystem);
+                document.getElementById('cryptobridgeSubmitTicket').addEventListener('click', cryptobridgeSubmitTicket);
+                document.getElementById('cryptobridgeBackToChat').addEventListener('click', cryptobridgeBackToChat);
+                
+                // Enhanced mobile-friendly outside click handling
+                document.addEventListener('click', function(e) {
+                    if (cryptobridgeIsOpen && 
+                        !cryptobridgeSupportContainer.contains(e.target) && 
+                        !cryptobridgeSupportToggle.contains(e.target)) {
+                        cryptobridgeMinimizeSupport();
+                    }
+                });
+                
+                // Touch optimization for mobile
+                document.addEventListener('touchstart', function(e) {
+                    if (cryptobridgeIsOpen && 
+                        !cryptobridgeSupportContainer.contains(e.target) && 
+                        !cryptobridgeSupportToggle.contains(e.target)) {
+                        cryptobridgeMinimizeSupport();
+                    }
+                }, { passive: true });
+                
+                // Prevent clicks inside support container from closing it
+                cryptobridgeSupportContainer.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+                // Handle mobile keyboard appearance
+                window.addEventListener('resize', cryptobridgeHandleMobileKeyboard);
+                
+                // Load previous conversation if exists
+                cryptobridgeLoadConversation();
+            }
+            
+            // Handle mobile keyboard
+            function cryptobridgeHandleMobileKeyboard() {
+                if (window.innerWidth < 768 && cryptobridgeIsOpen) {
+                    setTimeout(() => {
+                        cryptobridgeSupportMessages.scrollTop = cryptobridgeSupportMessages.scrollHeight;
+                    }, 300);
                 }
-            } else {
-                console.log('Closing chat');
-            }
-        }
-        
-        // Minimize support
-        function minimizeSupport() {
-            isOpen = false;
-            supportContainer.classList.remove('active');
-            supportToggle.classList.remove('active');
-            console.log('Chat minimized');
-        }
-        
-        // Close support
-        function closeSupport() {
-            minimizeSupport();
-            console.log('Chat closed');
-        }
-        
-        // Send message
-        function sendMessage() {
-            const message = supportInput.value.trim();
-            if (!message || isTyping) return;
-            
-            // Add user message
-            addMessage('user', message);
-            supportInput.value = '';
-            supportInput.style.height = 'auto';
-            sendButton.disabled = true;
-            
-            // Show typing indicator
-            showTypingIndicator();
-            
-            // Simulate bot response after delay
-            setTimeout(() => {
-                hideTypingIndicator();
-                const response = generateBotResponse(message);
-                addMessage('bot', response);
-                sendButton.disabled = false;
-                supportInput.focus();
-            }, 1000 + Math.random() * 1000);
-        }
-        
-        // Add message to chat
-        function addMessage(sender, content) {
-            const messageDiv = document.createElement('div');
-            const timestamp = new Date();
-            const timeString = timestamp.toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            
-            if (sender === 'bot') {
-                messageDiv.className = 'message bot';
-                messageDiv.innerHTML = `
-                    ${content}
-                    <span class="message-time">${timeString} • Sarah Johnson</span>
-                `;
-            } else {
-                messageDiv.className = 'message user';
-                messageDiv.innerHTML = `
-                    ${content}
-                    <span class="message-time">${timeString}</span>
-                `;
             }
             
-            supportMessages.appendChild(messageDiv);
-            supportMessages.scrollTop = supportMessages.scrollHeight;
+            // Toggle support window with enhanced UX
+            function cryptobridgeToggleSupport() {
+                cryptobridgeIsOpen = !cryptobridgeIsOpen;
+                cryptobridgeSupportToggle.classList.toggle('active');
+                cryptobridgeSupportContainer.classList.toggle('active');
+                
+                if (cryptobridgeIsOpen) {
+                    console.log('Opening CryptoBridge support chat');
+                    cryptobridgeSupportInput.focus();
+                    cryptobridgeUpdateNotificationBadge(0);
+                    
+                    // Show welcome message only once per session
+                    if (!cryptobridgeHasShownWelcome) {
+                        cryptobridgeShowWelcomeMessage();
+                        cryptobridgeHasShownWelcome = true;
+                    }
+                    
+                    // Save conversation state
+                    cryptobridgeSaveConversation();
+                } else {
+                    console.log('Closing CryptoBridge support chat');
+                }
+                
+                // Handle mobile viewport
+                if (window.innerWidth < 768) {
+                    document.body.style.overflow = cryptobridgeIsOpen ? 'hidden' : '';
+                }
+            }
             
-            // Add to conversation history
-            conversationHistory.push({
-                sender,
-                content,
-                timestamp: timestamp.toISOString()
-            });
-        }
-        
-        // Show typing indicator
-        function showTypingIndicator() {
-            if (isTyping) return;
-            isTyping = true;
+            // Minimize support with smooth animation
+            function cryptobridgeMinimizeSupport() {
+                cryptobridgeIsOpen = false;
+                cryptobridgeSupportContainer.classList.remove('active');
+                cryptobridgeSupportToggle.classList.remove('active');
+                
+                if (window.innerWidth < 768) {
+                    document.body.style.overflow = '';
+                }
+                
+                console.log('CryptoBridge chat minimized');
+            }
             
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'typing-with-agent';
-            typingDiv.innerHTML = `
-                <div class="typing-agent-avatar" style="background: #2563eb">
-                    👩‍💼
-                </div>
-                <div class="message-typing">
-                    <span class="typing-text">Sarah Johnson is typing</span>
-                    <div class="typing-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+            // Close support
+            function cryptobridgeCloseSupport() {
+                cryptobridgeMinimizeSupport();
+                cryptobridgeSaveConversation();
+                console.log('CryptoBridge chat closed');
+            }
+            
+            // Enhanced send message with AI integration
+            async function cryptobridgeSendMessage() {
+                const message = cryptobridgeSupportInput.value.trim();
+                if (!message || cryptobridgeIsTyping) return;
+                
+                // Add user message
+                cryptobridgeAddMessage('user', message);
+                cryptobridgeSupportInput.value = '';
+                cryptobridgeSupportInput.style.height = 'auto';
+                cryptobridgeSendButton.disabled = true;
+                
+                // Show typing indicator
+                cryptobridgeShowTypingIndicator();
+                
+                try {
+                    // Generate AI response
+                    const aiResponse = await cryptobridgeGenerateAIResponse(message);
+                    cryptobridgeHideTypingIndicator();
+                    cryptobridgeAddMessage('bot', aiResponse);
+                } catch (error) {
+                    console.error('AI Error:', error);
+                    cryptobridgeHideTypingIndicator();
+                    // Fallback to rule-based response
+                    const fallbackResponse = cryptobridgeGenerateFallbackResponse(message);
+                    cryptobridgeAddMessage('bot', fallbackResponse);
+                }
+                
+                cryptobridgeSendButton.disabled = false;
+                cryptobridgeSupportInput.focus();
+                cryptobridgeSaveConversation();
+            }
+            
+            // Enhanced AI response generation
+            async function cryptobridgeGenerateAIResponse(userMessage) {
+                // For demo, use rule-based. Replace with actual API call:
+                // return await cryptobridgeCallOpenAI(userMessage);
+                
+                // Professional rule-based responses for demo
+                const lowerMessage = userMessage.toLowerCase();
+                
+                if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                    return `👋 Hello! I'm Sarah Johnson, your dedicated CryptoBridge support specialist. I'm here to assist you with all your cryptocurrency exchange needs. How may I help you today?`;
+                }
+                
+                if (lowerMessage.includes('bonus') || lowerMessage.includes('+10%')) {
+                    return `🎯 **CryptoBridge +10% Bonus Program**\n\nOur exclusive bonus program adds 10% extra value to your transactions. For example, if you exchange $100 worth of cryptocurrency, you'll receive $110 in your PayPal account.\n\n**Key Details:**\n• Minimum transaction: $50\n• Maximum daily: $10,000\n• Bonus applies to all supported cryptocurrencies\n• No additional fees - bonus covers network costs\n\nWould you like to proceed with a bonus transaction today?`;
+                }
+                
+                if (lowerMessage.includes('time') || lowerMessage.includes('how long') || lowerMessage.includes('processing')) {
+                    return `⏱️ **Transaction Processing Times**\n\nAt CryptoBridge, we pride ourselves on efficient processing:\n\n• **Standard Transactions:** ${CRYPTOBRIDGE_KNOWLEDGE_BASE.processingTimes.standard}\n• **Priority Processing:** ${CRYPTOBRIDGE_KNOWLEDGE_BASE.processingTimes.priority}\n• **Blockchain Confirmations:** ${CRYPTOBRIDGE_KNOWLEDGE_BASE.processingTimes.blockchainConfirmations}\n\nMost transactions are completed within 15-30 minutes. Delays may occur during network congestion.`;
+                }
+                
+                if (lowerMessage.includes('security') || lowerMessage.includes('safe') || lowerMessage.includes('trust')) {
+                    return `🔒 **CryptoBridge Security Assurance**\n\nYour security is our top priority. We implement multiple layers of protection:\n\n${CRYPTOBRIDGE_KNOWLEDGE_BASE.securityFeatures.map(feature => `• ${feature}`).join('\n')}\n\nWe are fully licensed and regulated, with $250 million in insurance coverage for digital assets.`;
+                }
+                
+                if (lowerMessage.includes('fee') || lowerMessage.includes('cost')) {
+                    return `💰 **Transparent Fee Structure**\n\nCryptoBridge maintains complete fee transparency:\n\n• **Transaction Fee:** ${CRYPTOBRIDGE_KNOWLEDGE_BASE.fees}\n• **Network Fees:** Covered by our bonus program\n• **No Hidden Charges:** Guaranteed\n• **PayPal Withdrawal:** Free\n\nThe +10% bonus typically offsets all fees, providing you with better rates than the market average.`;
+                }
+                
+                if (lowerMessage.includes('status') || lowerMessage.includes('track') || lowerMessage.includes('where')) {
+                    return `📊 **Transaction Status Check**\n\nTo track your transaction:\n\n1. Check your registered email for confirmation\n2. Use the transaction ID provided in your receipt\n3. Visit our transaction portal at portal.cryptobridge.com\n4. Contact me with your transaction ID for real-time updates\n\nPlease provide your transaction ID, and I'll check the current status immediately.`;
+                }
+                
+                if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
+                    return `You're very welcome! 😊 It's my pleasure to assist you. Is there anything else about CryptoBridge services you'd like to know? Remember, we're available 24/7 for your convenience.`;
+                }
+                
+                if (lowerMessage.includes('problem') || lowerMessage.includes('issue') || lowerMessage.includes('help')) {
+                    return `I understand you're experiencing an issue. Let me help you resolve this efficiently.\n\nPlease provide:\n1. Your transaction ID (if applicable)\n2. The cryptocurrency involved\n3. Amount in USD\n4. Time of transaction\n\nAlternatively, you can click "Submit Ticket" below for dedicated technical support.`;
+                }
+                
+                if (lowerMessage.includes('crypto') || lowerMessage.includes('coin') || lowerMessage.includes('currency')) {
+                    return `🪙 **Supported Cryptocurrencies**\n\nCryptoBridge supports a wide range of cryptocurrencies:\n\n${CRYPTOBRIDGE_KNOWLEDGE_BASE.supportedCryptos.map(crypto => `• ${crypto}`).join('\n')}\n\nWe're constantly adding new cryptocurrencies based on user demand and security assessment.`;
+                }
+                
+                // Default professional response
+                return `Thank you for your message regarding "${userMessage}". I'm here to provide you with accurate information about CryptoBridge services.\n\nTo better assist you, could you please specify:\n1. Are you referring to a specific transaction?\n2. Which cryptocurrency are you interested in?\n3. Do you have a particular concern about our services?\n\nI'm ready to help you with any aspect of our platform! 💼`;
+            }
+            
+            // Actual OpenAI API call (commented out for demo)
+            async function cryptobridgeCallOpenAI(userMessage) {
+                const response = await fetch(CRYPTOBRIDGE_AI_CONFIG.endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${CRYPTOBRIDGE_AI_CONFIG.apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: CRYPTOBRIDGE_AI_CONFIG.model,
+                        messages: [
+                            {
+                                role: "system",
+                                content: `You are Sarah Johnson, a professional support specialist for CryptoBridge cryptocurrency exchange. Provide accurate, helpful information about:
+                                ${JSON.stringify(CRYPTOBRIDGE_KNOWLEDGE_BASE)}
+                                
+                                Always be:
+                                - Professional and courteous
+                                - Clear and concise
+                                - Factual and accurate
+                                - Helpful and solution-oriented
+                                - Use bullet points for clarity
+                                - Add relevant emojis for engagement
+                                
+                                Format responses with markdown for readability.`
+                            },
+                            {
+                                role: "user",
+                                content: userMessage
+                            }
+                        ],
+                        temperature: CRYPTOBRIDGE_AI_CONFIG.temperature,
+                        max_tokens: CRYPTOBRIDGE_AI_CONFIG.maxTokens
+                    })
+                });
+                
+                const data = await response.json();
+                return data.choices[0].message.content;
+            }
+            
+            // Fallback response generator
+            function cryptobridgeGenerateFallbackResponse(userMessage) {
+                return `Thank you for your inquiry. I'm currently experiencing high demand. Please try rephrasing your question or use one of the quick action buttons below for immediate assistance regarding:\n\n• Transaction processing times ⏱️\n• Security features 🔒\n• Bonus program details 🎯\n• Technical support 🛠️`;
+            }
+            
+            // Enhanced add message with better formatting
+            function cryptobridgeAddMessage(sender, content) {
+                const messageDiv = document.createElement('div');
+                const timestamp = new Date();
+                const timeString = timestamp.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                }).toLowerCase();
+                
+                messageDiv.className = `cryptobridge-message ${sender}`;
+                
+                // Format content with line breaks
+                const formattedContent = content.replace(/\n/g, '<br>');
+                
+                if (sender === 'bot') {
+                    messageDiv.innerHTML = `
+                        <div style="white-space: pre-line;">${formattedContent}</div>
+                        <span class="cryptobridge-message-time">${timeString} • Sarah Johnson</span>
+                    `;
+                } else {
+                    messageDiv.innerHTML = `
+                        <div style="white-space: pre-line;">${formattedContent}</div>
+                        <span class="cryptobridge-message-time">${timeString}</span>
+                    `;
+                }
+                
+                cryptobridgeSupportMessages.appendChild(messageDiv);
+                
+                // Smooth scroll to bottom
+                setTimeout(() => {
+                    cryptobridgeSupportMessages.scrollTo({
+                        top: cryptobridgeSupportMessages.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+                
+                // Add to conversation history
+                cryptobridgeConversationHistory.push({
+                    sender,
+                    content,
+                    timestamp: timestamp.toISOString()
+                });
+            }
+            
+            // Enhanced typing indicator
+            function cryptobridgeShowTypingIndicator() {
+                if (cryptobridgeIsTyping) return;
+                cryptobridgeIsTyping = true;
+                
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'cryptobridge-typing-with-agent';
+                typingDiv.innerHTML = `
+                    <div class="cryptobridge-typing-agent-avatar">
+                        👩‍💼
                     </div>
-                </div>
-            `;
-            
-            supportMessages.appendChild(typingDiv);
-            supportMessages.scrollTop = supportMessages.scrollHeight;
-        }
-        
-        // Hide typing indicator
-        function hideTypingIndicator() {
-            isTyping = false;
-            const typingIndicator = supportMessages.querySelector('.typing-with-agent');
-            if (typingIndicator) {
-                typingIndicator.remove();
-            }
-        }
-        
-        // Generate bot response
-        function generateBotResponse(userMessage) {
-            const lowerMessage = userMessage.toLowerCase();
-            
-            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-                return "Hello! 👋 I'm Sarah, your CryptoBridge support specialist. How can I help you today?";
+                    <div class="cryptobridge-message-typing">
+                        <span class="cryptobridge-typing-text">Sarah Johnson is typing</span>
+                        <div class="cryptobridge-typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                `;
+                
+                cryptobridgeSupportMessages.appendChild(typingDiv);
+                cryptobridgeSupportMessages.scrollTop = cryptobridgeSupportMessages.scrollHeight;
             }
             
-            if (lowerMessage.includes('time') || lowerMessage.includes('how long')) {
-                return `Transactions typically process within 5-15 minutes, but can take up to 30 minutes during high volume periods. Is there a specific transaction you're concerned about?`;
+            // Hide typing indicator
+            function cryptobridgeHideTypingIndicator() {
+                cryptobridgeIsTyping = false;
+                const typingIndicator = cryptobridgeSupportMessages.querySelector('.cryptobridge-typing-with-agent');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
             }
             
-            if (lowerMessage.includes('thank')) {
-                return "You're very welcome! 😊 Is there anything else I can help you with today?";
+            // Enhanced welcome message (shown once per session)
+            function cryptobridgeShowWelcomeMessage() {
+                const welcomeDiv = document.createElement('div');
+                welcomeDiv.className = 'cryptobridge-welcome-section';
+                welcomeDiv.innerHTML = `
+                    <h3 style="margin-top: 0; color: var(--cryptobridge-primary); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-shield-alt"></i> Welcome to CryptoBridge Professional Support
+                    </h3>
+                    <p style="margin-bottom: 12px; color: var(--cryptobridge-text-primary); font-weight: 500;">
+                        Hello! I'm <strong>Sarah Johnson</strong>, your dedicated support specialist. I'm here to provide you with expert assistance for all your cryptocurrency exchange needs.
+                    </p>
+                    <div style="background: rgba(37,99,235,0.05); border-radius: 12px; padding: 12px; margin: 12px 0;">
+                        <p style="margin: 0 0 8px 0; font-weight: 600; color: var(--cryptobridge-primary);">
+                            <i class="fas fa-bolt"></i> How I can assist you:
+                        </p>
+                        <ul style="margin: 0; padding-left: 20px; color: var(--cryptobridge-text-secondary);">
+                            <li>Transaction processing and tracking</li>
+                            <li>+10% bonus program inquiries</li>
+                            <li>Security and account protection</li>
+                            <li>Technical support and troubleshooting</li>
+                            <li>Market information and rates</li>
+                        </ul>
+                    </div>
+                    <p style="margin-top: 12px; margin-bottom: 0; color: var(--cryptobridge-text-secondary); font-size: 13.5px;">
+                        <i class="fas fa-clock"></i> Available 24/7 | <i class="fas fa-check-circle"></i> Licensed & Regulated
+                    </p>
+                `;
+                
+                cryptobridgeSupportMessages.appendChild(welcomeDiv);
+                cryptobridgeSupportMessages.scrollTop = cryptobridgeSupportMessages.scrollHeight;
             }
             
-            if (lowerMessage.includes('bonus') || lowerMessage.includes('+10%')) {
-                return `The +10% bonus is our special offer! We add 10% extra to the market rate when you exchange with us. For example, if you send $100 worth of crypto, you'll receive $110 in your PayPal account. 🎉`;
+            // Handle quick actions with enhanced responses
+            function cryptobridgeHandleQuickAction(action) {
+                console.log('Quick action triggered:', action);
+                
+                let userMessage = '';
+                switch(action) {
+                    case 'transaction-help':
+                        userMessage = "I need assistance with a cryptocurrency transaction";
+                        break;
+                    case 'payment-time':
+                        userMessage = "What are your current processing times?";
+                        break;
+                    case 'security-check':
+                        userMessage = "Can you detail your security measures?";
+                        break;
+                    case 'submit-ticket':
+                        cryptobridgeShowTicketSystem();
+                        return;
+                }
+                
+                // Add user message
+                cryptobridgeAddMessage('user', userMessage);
+                
+                // Show typing indicator
+                cryptobridgeShowTypingIndicator();
+                
+                // Generate and show response
+                setTimeout(() => {
+                    cryptobridgeHideTypingIndicator();
+                    const response = cryptobridgeGenerateFallbackResponse(userMessage);
+                    cryptobridgeAddMessage('bot', response);
+                }, 800);
             }
             
-            if (lowerMessage.includes('problem') || lowerMessage.includes('issue') || lowerMessage.includes('help')) {
-                return `I'm sorry to hear you're having issues. Let me help you with that. Could you provide more details about what's happening? Alternatively, you can click "Submit Ticket" below to create a support ticket.`;
+            // Show ticket system with enhanced UX
+            function cryptobridgeShowTicketSystem() {
+                cryptobridgeQuickActions.style.display = 'none';
+                cryptobridgeSupportInputArea.style.display = 'none';
+                cryptobridgeTicketSystem.classList.add('active');
+                
+                // Focus on first input
+                setTimeout(() => {
+                    document.getElementById('cryptobridgeTicketEmail').focus();
+                }, 100);
             }
             
-            if (lowerMessage.includes('status') || lowerMessage.includes('where')) {
-                return `To check your transaction status, please check your email for the confirmation message. If you don't see it, you can submit a ticket with your details and I'll personally look into it for you.`;
+            // Hide ticket system
+            function cryptobridgeHideTicketSystem() {
+                cryptobridgeTicketSystem.classList.remove('active');
+                cryptobridgeQuickActions.style.display = 'flex';
+                cryptobridgeSupportInputArea.style.display = 'block';
+                cryptobridgeSupportInput.focus();
             }
             
-            if (lowerMessage.includes('security') || lowerMessage.includes('safe')) {
-                return `CryptoBridge uses bank-grade security including SSL encryption, multi-signature wallets, and 95% cold storage. We're fully licensed and insured. Your funds are safe with us! 🔒`;
-            }
-            
-            // Default response
-            return `Thanks for your message! I understand you're asking about "${userMessage}". Could you provide a few more details so I can help you better? 😊`;
-        }
-        
-        // Show welcome message
-        function showWelcomeMessage() {
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.className = 'welcome-section';
-            welcomeDiv.innerHTML = `
-                <h3 style="margin-top: 0; color: #2563eb;">👋 Welcome to CryptoBridge Support!</h3>
-                <p style="margin-bottom: 10px;">Hello! I'm <strong>Sarah Johnson</strong>, your dedicated support specialist. I'm here to help you with:</p>
-                <ul style="margin: 10px 0; padding-left: 20px;">
-                    <li>Transaction status & tracking</li>
-                    <li>Processing time questions</li>
-                    <li>The +10% bonus program</li>
-                    <li>Security & safety concerns</li>
-                    <li>Technical issues</li>
-                </ul>
-                <p style="margin-top: 10px; margin-bottom: 0;"><strong>How can I assist you today?</strong> 😊</p>
-            `;
-            
-            supportMessages.appendChild(welcomeDiv);
-            supportMessages.scrollTop = supportMessages.scrollHeight;
-        }
-        
-        // Handle quick actions
-        function handleQuickAction(action) {
-            console.log('Quick action:', action);
-            
-            let userMessage = '';
-            switch(action) {
-                case 'transaction-help':
-                    userMessage = "I need help with a transaction";
-                    break;
-                case 'payment-time':
-                    userMessage = "How long do payments take?";
-                    break;
-                case 'security-check':
-                    userMessage = "Is CryptoBridge secure?";
-                    break;
-                case 'submit-ticket':
-                    showTicketSystem();
+            // Enhanced ticket submission
+            function cryptobridgeSubmitTicket() {
+                const email = document.getElementById('cryptobridgeTicketEmail').value.trim();
+                const wallet = document.getElementById('cryptobridgeTicketWallet').value.trim();
+                const message = document.getElementById('cryptobridgeTicketMessage').value.trim();
+                
+                if (!email || !wallet || !message) {
+                    cryptobridgeShowNotification('Please fill in all required fields', 'warning');
                     return;
+                }
+                
+                if (!cryptobridgeValidateEmail(email)) {
+                    cryptobridgeShowNotification('Please enter a valid email address', 'warning');
+                    return;
+                }
+                
+                // Generate unique ticket ID
+                const ticketId = 'CB-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                document.getElementById('cryptobridgeTicketIdDisplay').textContent = ticketId;
+                
+                // Show success state
+                cryptobridgeTicketSystem.classList.remove('active');
+                cryptobridgeSuccessState.classList.add('active');
+                
+                // Simulate ticket submission
+                console.log('Ticket submitted:', { email, wallet, message, ticketId });
+                
+                // Add notification to chat
+                setTimeout(() => {
+                    cryptobridgeAddMessage('bot', `🎫 **Ticket Created Successfully**\n\nYour support ticket **${ticketId}** has been created. Our technical team will review your case and contact you at ${email} within 15 minutes.\n\nYou can also continue chatting with me for immediate assistance.`);
+                }, 1000);
             }
             
-            // Add user message
-            addMessage('user', userMessage);
+            // Back to chat from success state
+            function cryptobridgeBackToChat() {
+                cryptobridgeSuccessState.classList.remove('active');
+                cryptobridgeQuickActions.style.display = 'flex';
+                cryptobridgeSupportInputArea.style.display = 'block';
+                
+                // Clear form
+                document.getElementById('cryptobridgeTicketEmail').value = '';
+                document.getElementById('cryptobridgeTicketWallet').value = '';
+                document.getElementById('cryptobridgeTicketMessage').value = '';
+                
+                cryptobridgeSupportInput.focus();
+            }
             
-            // Show typing indicator
-            showTypingIndicator();
+            // Enhanced notification badge
+            function cryptobridgeUpdateNotificationBadge(count) {
+                if (count > 0) {
+                    cryptobridgeNotificationBadge.textContent = count;
+                    cryptobridgeNotificationBadge.style.display = 'flex';
+                    
+                    // Add vibration on mobile (if supported)
+                    if (navigator.vibrate && window.innerWidth < 768) {
+                        navigator.vibrate(200);
+                    }
+                } else {
+                    cryptobridgeNotificationBadge.style.display = 'none';
+                }
+            }
             
-            // Generate and show response
+            // Email validation
+            function cryptobridgeValidateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+            
+            // Show notification
+            function cryptobridgeShowNotification(message, type = 'info') {
+                // Implement a toast notification system here
+                console.log(`${type.toUpperCase()}: ${message}`);
+            }
+            
+            // Save conversation to localStorage
+            function cryptobridgeSaveConversation() {
+                try {
+                    const data = {
+                        history: cryptobridgeConversationHistory,
+                        timestamp: new Date().toISOString(),
+                        hasShownWelcome: cryptobridgeHasShownWelcome
+                    };
+                    localStorage.setItem('cryptobridge_conversation', JSON.stringify(data));
+                } catch (e) {
+                    console.warn('Could not save conversation:', e);
+                }
+            }
+            
+            // Load conversation from localStorage
+            function cryptobridgeLoadConversation() {
+                try {
+                    const saved = localStorage.getItem('cryptobridge_conversation');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        cryptobridgeConversationHistory = data.history || [];
+                        cryptobridgeHasShownWelcome = data.hasShownWelcome || false;
+                        
+                        // Clear messages container
+                        cryptobridgeSupportMessages.innerHTML = '';
+                        
+                        // Replay conversation history
+                        if (cryptobridgeConversationHistory.length > 0) {
+                            // Only show welcome if it was shown before
+                            if (cryptobridgeHasShownWelcome) {
+                                cryptobridgeShowWelcomeMessage();
+                            }
+                            
+                            // Add all messages
+                            cryptobridgeConversationHistory.forEach(msg => {
+                                cryptobridgeAddMessage(msg.sender, msg.content);
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not load conversation:', e);
+                }
+            }
+            
+            // Start the enhanced system
+            cryptobridgeInitSupportSystem();
+            
+            // Demo notification after delay
             setTimeout(() => {
-                hideTypingIndicator();
-                const response = generateBotResponse(userMessage);
-                addMessage('bot', response);
-            }, 800);
-        }
-        
-        // Show ticket system
-        function showTicketSystem() {
-            quickActions.style.display = 'none';
-            supportInputArea.style.display = 'none';
-            ticketSystem.classList.add('active');
-        }
-        
-        // Hide ticket system
-        function hideTicketSystem() {
-            ticketSystem.classList.remove('active');
-            quickActions.style.display = 'flex';
-            supportInputArea.style.display = 'block';
-        }
-        
-        // Submit ticket
-        function submitTicket() {
-            const email = document.getElementById('ticketEmail').value;
-            const wallet = document.getElementById('ticketWallet').value;
-            const message = document.getElementById('ticketMessage').value;
+                if (!cryptobridgeIsOpen) {
+                    cryptobridgeUpdateNotificationBadge(1);
+                }
+            }, 15000);
             
-            if (!email || !wallet || !message) {
-                alert('Please fill in all fields');
-                return;
-            }
-            
-            // Generate ticket ID
-            const ticketId = 'TICKET-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-            document.getElementById('ticketIdDisplay').textContent = ticketId;
-            
-            // Show success state
-            ticketSystem.classList.remove('active');
-            successState.classList.add('active');
-        }
-        
-        // Back to chat from success state
-        function backToChat() {
-            successState.classList.remove('active');
-            quickActions.style.display = 'flex';
-            supportInputArea.style.display = 'block';
-            
-            // Clear form
-            document.getElementById('ticketEmail').value = '';
-            document.getElementById('ticketWallet').value = '';
-            document.getElementById('ticketMessage').value = '';
-        }
-        
-        // Update notification badge
-        function updateNotificationBadge(count) {
-            if (count > 0) {
-                notificationBadge.textContent = count;
-                notificationBadge.style.display = 'flex';
-            } else {
-                notificationBadge.style.display = 'none';
-            }
-        }
-        
-        // Start the system
-        initSupportSystem();
-        
-        // For demo purposes: Add a notification after 10 seconds if chat is closed
-        setTimeout(() => {
-            if (!isOpen) {
-                updateNotificationBadge(1);
-            }
-        }, 10000);
-    });
-</script>
+            // Handle mobile back button
+            window.addEventListener('popstate', function() {
+                if (cryptobridgeIsOpen && window.innerWidth < 768) {
+                    cryptobridgeMinimizeSupport();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
