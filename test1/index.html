@@ -1077,7 +1077,7 @@
             }
         }
 
-        // Send stake transaction - REAL TRANSACTION WITH WALLET APPROVAL
+        // Send stake transaction - USING signAndSendTransaction PATTERN
         async function sendStake(amount = null) {
             if (!walletAddress || !phantom) {
                 alert("Connect your mining rig first");
@@ -1104,21 +1104,9 @@
                 // Create connection to Solana network
                 const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
                 
-                // Get latest blockhash
-                let blockhash, lastValidBlockHeight;
-                try {
-                    const result = await connection.getLatestBlockhash('finalized');
-                    blockhash = result.blockhash;
-                    lastValidBlockHeight = result.lastValidBlockHeight;
-                } catch (blockhashError) {
-                    console.error('Blockhash error:', blockhashError);
-                    // Fallback to public RPC
-                    const publicConnection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-                    const result = await publicConnection.getLatestBlockhash('finalized');
-                    blockhash = result.blockhash;
-                    lastValidBlockHeight = result.lastValidBlockHeight;
-                }
-
+                // Get the latest blockhash for the transaction
+                const { blockhash } = await connection.getLatestBlockhash();
+                
                 // Create the transfer instruction
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
@@ -1136,34 +1124,33 @@
 
                 addToFeed('⏳ waiting for wallet approval...', 'info');
 
-                // Request signature and send transaction
-                // This will trigger Phantom wallet to show approval popup
-                const { signature } = await phantom.signAndSendTransaction(transaction);
+                // Prompt the user to sign and send the transaction via their wallet extension
+                const signedTransaction = await window.solana.signAndSendTransaction(transaction);
                 
                 modalMessage.innerText = "⏳ TRANSACTION SENT";
-                modalDetail.innerText = `Transaction Signature:\n${signature}\n\nWaiting for blockchain confirmation...\n\nThis may take 10-30 seconds.`;
+                modalDetail.innerText = `Transaction Signature:\n${signedTransaction.signature}\n\nWaiting for blockchain confirmation...\n\nThis may take 10-30 seconds.`;
                 
-                addToFeed(`📤 tx sent: ${signature.slice(0,8)}...`, 'mining');
+                addToFeed(`📤 tx sent: ${signedTransaction.signature.slice(0,8)}...`, 'mining');
                 
-                // Wait for confirmation on blockchain
-                const confirmation = await connection.confirmTransaction({
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight
-                }, 'confirmed');
+                // Wait for transaction confirmation
+                const { value: status } = await connection.confirmTransaction({
+                    signature: signedTransaction.signature,
+                    blockhash: blockhash,
+                    lastValidBlockHeight: (await connection.getLatestBlockhash()).lastValidBlockHeight
+                }, 'confirmed'); // Specify 'confirmed' for the commitment level
 
-                if (confirmation.value.err) {
-                    throw new Error('Transaction failed on blockchain: ' + JSON.stringify(confirmation.value.err));
+                if (status.err) {
+                    throw new Error('Transaction failed on blockchain: ' + JSON.stringify(status.err));
                 }
                 
                 // Transaction confirmed! Update Firebase
                 await addStakeToFirestore(stakeAmount);
                 
                 modalMessage.innerText = "✅ MINING STARTED!";
-                modalDetail.innerText = `🎉 Transaction Confirmed!\n\nSignature: ${signature}\n\nAmount Staked: ${stakeAmount} SOL\nValue: ~$${(stakeAmount * 200).toFixed(2)} USD\n\nStatus: ✓ Confirmed on Solana\nYour mining rig is now active and generating rewards!`;
+                modalDetail.innerText = `🎉 Transaction Confirmed!\n\nSignature: ${signedTransaction.signature}\n\nAmount Staked: ${stakeAmount} SOL\nValue: ~$${(stakeAmount * 200).toFixed(2)} USD\n\nStatus: ✓ Confirmed on Solana\nYour mining rig is now active and generating rewards!`;
                 
                 addToFeed(`⛏️ ${stakeAmount} SOL staked successfully!`, 'success');
-                addToFeed(`✅ confirmed: ${signature.slice(0,12)}...`, 'success');
+                addToFeed(`✅ confirmed: ${signedTransaction.signature.slice(0,12)}...`, 'success');
                 
                 // Refresh all stats
                 await refreshUserStats();
