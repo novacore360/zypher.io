@@ -768,7 +768,9 @@
         const db = getFirestore(fbApp);
 
         const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
-        const HELIUS_RPC = "https://mainnet.helius-rpc.com/?apiKey=a6328d07-7441-42c2-afb0-3bcd6a932c17";
+        
+        // FIXED: Correct Helius RPC URL format
+        const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
         
         let phantom = null;
         let walletAddress = null;
@@ -898,7 +900,7 @@
             hashRateSpan.innerHTML = `⚡ ${hashRate.toLocaleString()} H/s`;
         }
 
-        // FIREBASE FUNCTIONS - UPDATED to READ FIRST then CREATE if not exists
+        // FIREBASE FUNCTIONS - READ FIRST then CREATE if not exists
         async function loadUserData(address) {
             if (!address) return null;
             
@@ -1081,8 +1083,21 @@
                     await phantom.connect();
                 }
 
+                // FIXED: Using the correct Helius RPC URL
                 const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
-                const { blockhash } = await connection.getLatestBlockhash();
+                
+                // Add timeout and retry logic
+                let blockhash;
+                try {
+                    const result = await connection.getLatestBlockhash();
+                    blockhash = result.blockhash;
+                } catch (blockhashError) {
+                    console.error('Blockhash error:', blockhashError);
+                    // Try public RPC as fallback
+                    const publicConnection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+                    const result = await publicConnection.getLatestBlockhash();
+                    blockhash = result.blockhash;
+                }
 
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
@@ -1102,6 +1117,8 @@
                 modalDetail.innerText = `Transaction: ${txid.slice(0,8)}...${txid.slice(-8)}\nAmount: ${stakeAmount} SOL`;
                 
                 await addStakeToFirestore(stakeAmount);
+                
+                // Confirm transaction
                 await connection.confirmTransaction(txid, 'confirmed');
                 
                 addToFeed(`⛏️ mining started with ${stakeAmount} SOL`, 'mining');
