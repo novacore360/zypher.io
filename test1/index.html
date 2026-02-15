@@ -904,6 +904,7 @@
             confirmMessage.innerText = message;
             confirmDetail.innerText = detail;
             confirmModal.classList.add('active');
+            
             return new Promise((resolve) => {
                 const onApprove = () => {
                     cleanup();
@@ -918,15 +919,16 @@
                     approveConfirmBtn.removeEventListener('click', onApprove);
                     cancelConfirmBtn.removeEventListener('click', onCancel);
                 };
-                approveConfirmBtn.addEventListener('click', onApprove, { once: true });
-                cancelConfirmBtn.addEventListener('click', onCancel, { once: true });
+                
+                approveConfirmBtn.addEventListener('click', onApprove);
+                cancelConfirmBtn.addEventListener('click', onCancel);
             });
         }
 
         function showTxModal(title, message, detail) {
             txModalTitle.innerText = title;
             modalMessage.innerText = message;
-            modalDetail.innerText = detail;
+            modalDetail.innerText = detail || '';
             txModal.classList.add('active');
         }
 
@@ -943,7 +945,6 @@
 
         function formatAddr(addr) {
             if (!addr) return '';
-            if (addr.length <= 8) return addr;
             return addr.slice(0,4) + '...' + addr.slice(-4);
         }
 
@@ -962,33 +963,37 @@
                 warning: 'fa-exclamation-triangle warning'
             };
             
-            const icon = iconMap[type] || iconMap.info;
+            const iconClass = iconMap[type] || iconMap.info;
             
-            feedItems.unshift({ message, type, time: Date.now() });
+            feedItems.unshift({ message, type });
             if (feedItems.length > 8) feedItems.pop();
             
             updateFeed();
         }
 
         function updateFeed() {
-            miningFeed.innerHTML = feedItems.map(item => `
-                <div class="feed-item">
-                    <i class="fas ${item.type === 'success' ? 'fa-check-circle success' : 
-                                     item.type === 'mining' ? 'fa-bolt mining' : 
-                                     item.type === 'warning' ? 'fa-exclamation-triangle warning' : 
-                                     'fa-circle info'}"></i>
-                    <span>${item.message}</span>
-                </div>
-            `).join('');
+            miningFeed.innerHTML = feedItems.map(item => {
+                let iconClass = 'fa-circle info';
+                if (item.type === 'success') iconClass = 'fa-check-circle success';
+                else if (item.type === 'mining') iconClass = 'fa-bolt mining';
+                else if (item.type === 'warning') iconClass = 'fa-exclamation-triangle warning';
+                
+                return `
+                    <div class="feed-item">
+                        <i class="fas ${iconClass}"></i>
+                        <span>${item.message}</span>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Calculate tier and boost
         function calculateTier(totalStaked) {
-            if (totalStaked >= 100) return { tier: 'DIAMOND', boost: 2.5, next: null, color: '#b9f2ff' };
-            if (totalStaked >= 50) return { tier: 'PLATINUM', boost: 2.0, next: 100, color: '#e5e4e2' };
-            if (totalStaked >= 25) return { tier: 'GOLD', boost: 1.5, next: 50, color: 'gold' };
-            if (totalStaked >= 10) return { tier: 'SILVER', boost: 1.2, next: 25, color: 'silver' };
-            return { tier: 'BRONZE', boost: 1.0, next: 10, color: '#cd7f32' };
+            if (totalStaked >= 100) return { tier: 'DIAMOND', boost: 2.5, next: null };
+            if (totalStaked >= 50) return { tier: 'PLATINUM', boost: 2.0, next: 100 };
+            if (totalStaked >= 25) return { tier: 'GOLD', boost: 1.5, next: 50 };
+            if (totalStaked >= 10) return { tier: 'SILVER', boost: 1.2, next: 25 };
+            return { tier: 'BRONZE', boost: 1.0, next: 10 };
         }
 
         // Update all mining stats
@@ -1030,11 +1035,9 @@
                 const snap = await getDoc(userDocRef);
                 
                 if (snap.exists()) {
-                    console.log('Found existing user data');
                     addToFeed('📊 loaded existing mining data', 'info');
                     return snap.data();
                 } else {
-                    console.log('No existing data, creating new user');
                     const now = Date.now();
                     const newData = {
                         wallet: address,
@@ -1125,7 +1128,6 @@
             
             await refreshUserStats();
             addToFeed(`📦 +${amountSol} SOL added to mining rig`, 'success');
-            addToFeed(`✅ tx: ${signature.slice(0,12)}...`, 'success');
         }
 
         // Connect Phantom
@@ -1157,7 +1159,7 @@
                 const userData = await loadUserData(walletAddress);
                 
                 if (userData) {
-                    const updatedData = await calculateDailyRewards(userData);
+                    await calculateDailyRewards(userData);
                     
                     walletAddrSpan.innerText = formatAddr(walletAddress);
                     walletInfoDiv.style.display = 'block';
@@ -1193,7 +1195,7 @@
                 return;
             }
 
-            // Step 1: Show confirmation modal (like the example with showCustomAlert)
+            // Step 1: Show confirmation modal
             const tierInfo = calculateTier(parseFloat(totalStakedSpan.innerText) || 0);
             const estimatedDailyReward = stakeAmount * 0.1 * tierInfo.boost;
             
@@ -1225,12 +1227,14 @@
                 const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
                 
                 // Get latest blockhash
-                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
 
                 // Create the transfer instruction
                 const fromWalletPublicKey = new solanaWeb3.PublicKey(walletAddress);
                 const toWalletPublicKey = new solanaWeb3.PublicKey(RECEIVER_ADDRESS);
-                const lamports = Math.floor(stakeAmount * solanaWeb3.LAMPORTS_PER_SOL);
+                
+                // Convert SOL to lamports correctly (1 SOL = 1,000,000,000 lamports)
+                const lamports = Math.round(stakeAmount * solanaWeb3.LAMPORTS_PER_SOL);
 
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
@@ -1250,8 +1254,15 @@
 
                 addToFeed('⏳ waiting for wallet approval...', 'info');
 
-                // Prompt user to sign and send transaction via wallet extension
-                const { signature } = await window.solana.signAndSendTransaction(transaction);
+                // Get the provider (Phantom)
+                const provider = window.phantom?.solana || window.solana;
+                
+                if (!provider) {
+                    throw new Error("Phantom wallet not found");
+                }
+
+                // Sign and send transaction
+                const { signature } = await provider.signAndSendTransaction(transaction);
 
                 updateTxModal(
                     "⏳ CONFIRMING TRANSACTION",
@@ -1261,14 +1272,14 @@
                 addToFeed(`📤 tx sent: ${signature.slice(0,8)}...`, 'mining');
                 
                 // Wait for transaction confirmation
-                const { value: status } = await connection.confirmTransaction({
+                const confirmation = await connection.confirmTransaction({
                     signature,
                     blockhash,
                     lastValidBlockHeight
                 }, 'confirmed');
 
-                if (status.err) {
-                    throw new Error('Transaction failed on blockchain: ' + JSON.stringify(status.err));
+                if (confirmation.value.err) {
+                    throw new Error('Transaction failed on blockchain');
                 }
 
                 // Transaction confirmed! Update Firebase
