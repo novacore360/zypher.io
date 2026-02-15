@@ -749,8 +749,15 @@
         </div>
     </div>
 
+    <!-- Buffer Polyfill - This fixes the "buffer is not defined" error -->
+    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/dist/buffer.min.js"></script>
+    
     <!-- Firebase + Phantom + Solana -->
     <script type="module">
+        // Make Buffer available globally
+        window.Buffer = window.Buffer || Buffer;
+        
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
@@ -837,8 +844,6 @@
                 info: 'fa-circle info',
                 warning: 'fa-exclamation-triangle warning'
             };
-            
-            const icon = iconMap[type] || iconMap.info;
             
             feedItems.unshift({ message, type, time: Date.now() });
             if (feedItems.length > 8) feedItems.pop();
@@ -1192,7 +1197,5 @@
             }
         });
     </script>
-    
-    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </body>
 </html>
