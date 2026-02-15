@@ -200,7 +200,7 @@
             align-items: center;
             justify-content: center;
             gap: var(--spacing-sm);
-            min-height: 48px; /* Touch-friendly */
+            min-height: 48px;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
@@ -879,12 +879,12 @@
             
             // Next tier info
             if (tierInfo.next) {
-                const progress = totalStaked - (tierInfo.next - (tierInfo.tier === 'BRONZE' ? 0 : 
-                                   tierInfo.tier === 'SILVER' ? 10 : 
-                                   tierInfo.tier === 'GOLD' ? 25 : 50));
-                nextTierInfo.innerHTML = `<i class="fas fa-arrow-up"></i> ${progress.toFixed(2)}/${tierInfo.next - (tierInfo.tier === 'BRONZE' ? 0 : 
-                                          tierInfo.tier === 'SILVER' ? 10 : 
-                                          tierInfo.tier === 'GOLD' ? 25 : 50)} SOL`;
+                const currentTierMin = tierInfo.tier === 'BRONZE' ? 0 : 
+                                       tierInfo.tier === 'SILVER' ? 10 : 
+                                       tierInfo.tier === 'GOLD' ? 25 : 50;
+                const progress = totalStaked - currentTierMin;
+                const needed = tierInfo.next - currentTierMin;
+                nextTierInfo.innerHTML = `<i class="fas fa-arrow-up"></i> ${progress.toFixed(2)}/${needed} SOL`;
             } else {
                 nextTierInfo.innerHTML = '<i class="fas fa-crown"></i> MAX TIER';
             }
@@ -898,49 +898,78 @@
             hashRateSpan.innerHTML = `⚡ ${hashRate.toLocaleString()} H/s`;
         }
 
-        // Firestore Functions
-        async function initUserDoc(address) {
-            if (!address) return;
+        // FIREBASE FUNCTIONS - UPDATED to READ FIRST then CREATE if not exists
+        async function loadUserData(address) {
+            if (!address) return null;
+            
             const docId = address;
             userDocRef = doc(db, 'stakes', docId);
             
-            const snap = await getDoc(userDocRef);
-            const now = Date.now();
-            
-            if (!snap.exists()) {
-                await setDoc(userDocRef, {
-                    wallet: address,
-                    totalStaked: 0,
-                    lastDailyUpdate: now,
-                    createdAt: serverTimestamp()
-                });
-                addToFeed('🚀 new mining rig deployed', 'success');
-            } else {
-                const data = snap.data();
-                let total = data.totalStaked || 0;
-                const lastUpdate = data.lastDailyUpdate || now;
-                const daysPassed = Math.floor((now - lastUpdate) / (86400 * 1000));
+            try {
+                const snap = await getDoc(userDocRef);
                 
-                if (daysPassed > 0 && total > 0) {
-                    const tierInfo = calculateTier(total);
+                if (snap.exists()) {
+                    // Document exists - just return the data
+                    console.log('Found existing user data');
+                    addToFeed('📊 loaded existing mining data', 'info');
+                    return snap.data();
+                } else {
+                    // Document doesn't exist - create new
+                    console.log('No existing data, creating new user');
+                    const now = Date.now();
+                    const newData = {
+                        wallet: address,
+                        totalStaked: 0,
+                        lastDailyUpdate: now,
+                        createdAt: serverTimestamp()
+                    };
                     
-                    for (let i = 0; i < daysPassed; i++) {
-                        total = total * (1 + (0.1 * tierInfo.boost));
-                    }
-                    
-                    await updateDoc(userDocRef, {
-                        totalStaked: total,
-                        lastDailyUpdate: now
-                    });
-                    
-                    addToFeed(`⛏️ mined ${daysPassed} day(s) · ${tierInfo.boost}x boost`, 'mining');
+                    await setDoc(userDocRef, newData);
+                    addToFeed('🚀 new mining rig deployed', 'success');
+                    return newData;
                 }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                addToFeed('⚠️ error loading mining data', 'warning');
+                return null;
             }
-            await refreshUserStats();
         }
 
+        // Calculate and apply daily rewards
+        async function calculateDailyRewards(currentData) {
+            if (!currentData) return null;
+            
+            const now = Date.now();
+            const lastUpdate = currentData.lastDailyUpdate || now;
+            const daysPassed = Math.floor((now - lastUpdate) / (86400 * 1000));
+            
+            if (daysPassed > 0 && currentData.totalStaked > 0) {
+                let total = currentData.totalStaked;
+                const tierInfo = calculateTier(total);
+                
+                // Apply daily rewards with boost
+                for (let i = 0; i < daysPassed; i++) {
+                    total = total * (1 + (0.1 * tierInfo.boost));
+                }
+                
+                // Update in Firestore
+                await updateDoc(userDocRef, {
+                    totalStaked: total,
+                    lastDailyUpdate: now
+                });
+                
+                addToFeed(`⛏️ mined ${daysPassed} day(s) · ${tierInfo.boost}x boost`, 'mining');
+                
+                return { ...currentData, totalStaked: total, lastDailyUpdate: now };
+            }
+            
+            return currentData;
+        }
+
+        // Refresh UI with latest data
         async function refreshUserStats() {
-            if (!userDocRef) return;
+            if (!userDocRef || !walletAddress) return;
+            
             const snap = await getDoc(userDocRef);
             if (!snap.exists()) return;
             
@@ -958,6 +987,7 @@
             updateMiningStats(total);
         }
 
+        // Add stake and update Firestore
         async function addStakeToFirestore(amountSol) {
             if (!userDocRef || !walletAddress) return;
             
@@ -997,24 +1027,37 @@
             }
 
             try {
+                // Show loading state
+                connectBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i><span class="btn-text">LOADING...</span>';
+                
                 const resp = await phantom.connect();
                 walletAddress = resp.publicKey.toString();
                 
-                walletAddrSpan.innerText = formatAddr(walletAddress);
-                walletInfoDiv.style.display = 'block';
-                connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">MINING ACTIVE</span>';
-                connectBtn.style.background = 'rgba(0, 255, 170, 0.15)';
-                connectBtn.style.borderColor = '#00ffaa';
+                // Load existing data or create new
+                const userData = await loadUserData(walletAddress);
                 
-                await initUserDoc(walletAddress);
-                addToFeed('🔌 mining rig connected to network', 'success');
-                
-                // Start live mining simulation
-                startMiningSimulation();
+                if (userData) {
+                    // Calculate any pending daily rewards
+                    const updatedData = await calculateDailyRewards(userData);
+                    
+                    // Update UI
+                    walletAddrSpan.innerText = formatAddr(walletAddress);
+                    walletInfoDiv.style.display = 'block';
+                    connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">MINING ACTIVE</span>';
+                    connectBtn.style.background = 'rgba(0, 255, 170, 0.15)';
+                    connectBtn.style.borderColor = '#00ffaa';
+                    
+                    await refreshUserStats();
+                    addToFeed('🔌 mining rig connected to network', 'success');
+                    
+                    // Start live mining simulation
+                    startMiningSimulation();
+                }
                 
             } catch (err) {
                 console.error('Connection error:', err);
                 alert('Failed to connect: ' + err.message);
+                connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">CONNECT PHANTOM</span>';
             }
         }
 
@@ -1106,20 +1149,29 @@
         quickStake5.addEventListener('click', () => sendStake(5));
         quickStake10.addEventListener('click', () => sendStake(10));
 
-        // Auto-connect
+        // Auto-connect with data loading
         window.addEventListener('load', async () => {
             phantom = getPhantom();
             if (phantom?.isConnected && phantom.publicKey) {
                 walletAddress = phantom.publicKey.toString();
-                walletAddrSpan.innerText = formatAddr(walletAddress);
-                walletInfoDiv.style.display = 'block';
-                connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">MINING ACTIVE</span>';
-                connectBtn.style.background = 'rgba(0, 255, 170, 0.15)';
-                connectBtn.style.borderColor = '#00ffaa';
                 
-                await initUserDoc(walletAddress);
-                startMiningSimulation();
-                addToFeed('🔄 mining rig resumed', 'success');
+                // Load existing data or create new
+                const userData = await loadUserData(walletAddress);
+                
+                if (userData) {
+                    // Calculate any pending daily rewards
+                    await calculateDailyRewards(userData);
+                    
+                    walletAddrSpan.innerText = formatAddr(walletAddress);
+                    walletInfoDiv.style.display = 'block';
+                    connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">MINING ACTIVE</span>';
+                    connectBtn.style.background = 'rgba(0, 255, 170, 0.15)';
+                    connectBtn.style.borderColor = '#00ffaa';
+                    
+                    await refreshUserStats();
+                    startMiningSimulation();
+                    addToFeed('🔄 mining rig resumed', 'success');
+                }
             }
         });
     </script>
