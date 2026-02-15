@@ -748,10 +748,11 @@
             </div>
         </div>
     </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/buffer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
 <script>
-window.Buffer = buffer.Buffer;
+window.Buffer = window.Buffer || window.buffer?.Buffer;
 </script>
+
     <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 
     <!-- Firebase + Phantom + Solana -->
@@ -1067,6 +1068,45 @@ window.Buffer = buffer.Buffer;
                 connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">CONNECT PHANTOM</span>';
             }
         }
+       async function sendStakeTransaction(amountSol) {
+    if (!phantom || !walletAddress) {
+        alert("Connect Phantom first");
+        return;
+    }
+
+    try {
+        const connection = new solanaWeb3.Connection(HELIUS_RPC);
+
+        const fromPubkey = phantom.publicKey;
+        const toPubkey = new solanaWeb3.PublicKey(RECEIVER_ADDRESS);
+
+        const transaction = new solanaWeb3.Transaction().add(
+            solanaWeb3.SystemProgram.transfer({
+                fromPubkey,
+                toPubkey,
+                lamports: amountSol * solanaWeb3.LAMPORTS_PER_SOL
+            })
+        );
+
+        transaction.feePayer = fromPubkey;
+
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+
+        // 🚀 Phantom popup will appear — NO modal needed
+        const signed = await phantom.signTransaction(transaction);
+
+        const sig = await connection.sendRawTransaction(signed.serialize());
+
+        await connection.confirmTransaction(sig);
+
+        addToFeed(`✅ Transaction confirmed: ${sig.slice(0,8)}...`, 'success');
+
+    } catch (err) {
+        console.error(err);
+        addToFeed(`❌ Transaction failed`, 'warning');
+    }
+}
 
         // Send stake transaction
         async function sendStake(amount = null) {
