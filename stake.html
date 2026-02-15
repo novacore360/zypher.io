@@ -749,8 +749,15 @@
         </div>
     </div>
 
+    <!-- Add Buffer polyfill first -->
+    <script src="https://unpkg.com/buffer@6.0.3/index.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
+    
     <!-- Firebase + Phantom + Solana -->
     <script type="module">
+        // Make Buffer available globally
+        window.Buffer = window.Buffer || require('buffer').Buffer;
+        
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
@@ -1192,7 +1199,5 @@
             }
         });
     </script>
-    
-    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </body>
 </html>
