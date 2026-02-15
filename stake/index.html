@@ -585,6 +585,21 @@
         .w-100 { width: 100%; }
         .mt-2 { margin-top: var(--spacing-md); }
         .mb-2 { margin-bottom: var(--spacing-md); }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: var(--border-radius-md);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -617,6 +632,8 @@
                         </span>
                     </div>
                 </div>
+                
+                <div id="connectionError" class="error-message"></div>
             </div>
 
             <!-- Mining Stats Grid -->
@@ -758,8 +775,14 @@
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        let db;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+        }
 
         // Global variables
         let phantom = null;
@@ -792,6 +815,7 @@
         const modalMessage = document.getElementById('modalMessage');
         const modalDetail = document.getElementById('modalDetail');
         const modalClose = document.getElementById('modalCloseBtn');
+        const connectionError = document.getElementById('connectionError');
 
         // Quick stake buttons
         const quickStake0_5 = document.getElementById('quickStake0_5');
@@ -817,23 +841,20 @@
         }
 
         function getPhantom() {
-            if (window?.phantom?.solana) return window.phantom.solana;
-            if (window?.solana?.isPhantom) return window.solana;
+            // Check for Phantom in various locations
+            if (window.phantom?.solana?.isPhantom) {
+                return window.phantom.solana;
+            }
+            if (window.solana?.isPhantom) {
+                return window.solana;
+            }
             return null;
         }
 
         // Add to mining feed
         function addToFeed(message, type = 'info') {
-            const iconMap = {
-                success: 'fa-check-circle success',
-                mining: 'fa-bolt mining',
-                info: 'fa-circle info',
-                warning: 'fa-exclamation-triangle warning'
-            };
-            
             feedItems.unshift({ message, type, time: Date.now() });
             if (feedItems.length > 8) feedItems.pop();
-            
             updateFeed();
         }
 
@@ -851,11 +872,11 @@
 
         // Calculate tier and boost
         function calculateTier(totalStaked) {
-            if (totalStaked >= 100) return { tier: 'DIAMOND', boost: 2.5, next: null, color: '#b9f2ff' };
-            if (totalStaked >= 50) return { tier: 'PLATINUM', boost: 2.0, next: 100, color: '#e5e4e2' };
-            if (totalStaked >= 25) return { tier: 'GOLD', boost: 1.5, next: 50, color: 'gold' };
-            if (totalStaked >= 10) return { tier: 'SILVER', boost: 1.2, next: 25, color: 'silver' };
-            return { tier: 'BRONZE', boost: 1.0, next: 10, color: '#cd7f32' };
+            if (totalStaked >= 100) return { tier: 'DIAMOND', boost: 2.5, next: null };
+            if (totalStaked >= 50) return { tier: 'PLATINUM', boost: 2.0, next: 100 };
+            if (totalStaked >= 25) return { tier: 'GOLD', boost: 1.5, next: 50 };
+            if (totalStaked >= 10) return { tier: 'SILVER', boost: 1.2, next: 25 };
+            return { tier: 'BRONZE', boost: 1.0, next: 10 };
         }
 
         // Update all mining stats
@@ -897,7 +918,7 @@
 
         // Firebase Functions
         async function loadUserData(address) {
-            if (!address) return null;
+            if (!address || !db) return null;
             
             const docId = address;
             userDocRef = db.collection('stakes').doc(docId);
@@ -965,37 +986,45 @@
         async function refreshUserStats() {
             if (!userDocRef || !walletAddress) return;
             
-            const doc = await userDocRef.get();
-            if (!doc.exists) return;
-            
-            const data = doc.data();
-            const total = data.totalStaked || 0;
-            const last = data.lastDailyUpdate ? new Date(data.lastDailyUpdate).toLocaleString() : 'just now';
-            
-            totalStakedSpan.innerText = total.toFixed(4);
-            lastUpdateSpan.innerText = last;
-            
-            updateMiningStats(total);
+            try {
+                const doc = await userDocRef.get();
+                if (!doc.exists) return;
+                
+                const data = doc.data();
+                const total = data.totalStaked || 0;
+                const last = data.lastDailyUpdate ? new Date(data.lastDailyUpdate).toLocaleString() : 'just now';
+                
+                totalStakedSpan.innerText = total.toFixed(4);
+                lastUpdateSpan.innerText = last;
+                
+                updateMiningStats(total);
+            } catch (error) {
+                console.error('Error refreshing stats:', error);
+            }
         }
 
         // Add stake and update Firestore
         async function addStakeToFirestore(amountSol, txid) {
             if (!userDocRef || !walletAddress) return;
             
-            const doc = await userDocRef.get();
-            if (!doc.exists) return;
-            
-            const currentTotal = doc.data().totalStaked || 0;
-            const newTotal = currentTotal + amountSol;
-            
-            await userDocRef.update({
-                totalStaked: newTotal,
-                lastDailyUpdate: Date.now(),
-                lastTransaction: txid
-            });
-            
-            await refreshUserStats();
-            addToFeed(`📦 +${amountSol} SOL added to mining rig`, 'success');
+            try {
+                const doc = await userDocRef.get();
+                if (!doc.exists) return;
+                
+                const currentTotal = doc.data().totalStaked || 0;
+                const newTotal = currentTotal + amountSol;
+                
+                await userDocRef.update({
+                    totalStaked: newTotal,
+                    lastDailyUpdate: Date.now(),
+                    lastTransaction: txid
+                });
+                
+                await refreshUserStats();
+                addToFeed(`📦 +${amountSol} SOL added to mining rig`, 'success');
+            } catch (error) {
+                console.error('Error adding stake to Firestore:', error);
+            }
         }
 
         // Send stake transaction with proper confirmation
@@ -1114,9 +1143,16 @@
 
         // Connect Phantom
         async function connectPhantom() {
+            // Hide any previous error
+            connectionError.classList.remove('show');
+            
+            // Check if Phantom is installed
             phantom = getPhantom();
             
             if (!phantom) {
+                connectionError.innerText = 'Phantom wallet not found. Please install Phantom wallet.';
+                connectionError.classList.add('show');
+                
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 if (isMobile) {
                     if (confirm("Open Phantom app to start mining?")) {
@@ -1127,7 +1163,6 @@
                     }
                 } else {
                     window.open("https://phantom.app/", "_blank");
-                    alert("Please install Phantom wallet to start mining");
                 }
                 return;
             }
@@ -1135,9 +1170,18 @@
             try {
                 // Show loading state
                 connectBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i><span class="btn-text">LOADING...</span>';
+                connectBtn.disabled = true;
                 
-                const resp = await phantom.connect();
-                walletAddress = resp.publicKey.toString();
+                // Check if already connected
+                if (phantom.isConnected && phantom.publicKey) {
+                    walletAddress = phantom.publicKey.toString();
+                } else {
+                    // Request connection
+                    const resp = await phantom.connect();
+                    walletAddress = resp.publicKey.toString();
+                }
+                
+                console.log('Connected to wallet:', walletAddress);
                 
                 // Load existing data or create new
                 const userData = await loadUserData(walletAddress);
@@ -1162,8 +1206,11 @@
                 
             } catch (err) {
                 console.error('Connection error:', err);
-                alert('Failed to connect: ' + err.message);
+                connectionError.innerText = 'Failed to connect: ' + (err.message || 'Unknown error');
+                connectionError.classList.add('show');
                 connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">CONNECT PHANTOM</span>';
+            } finally {
+                connectBtn.disabled = false;
             }
         }
 
@@ -1194,6 +1241,16 @@
             }, 5000);
         }
 
+        // Check if Phantom is available and auto-connect
+        function checkPhantomAndConnect() {
+            phantom = getPhantom();
+            if (phantom?.isConnected && phantom.publicKey) {
+                walletAddress = phantom.publicKey.toString();
+                console.log('Auto-connecting to Phantom');
+                connectPhantom();
+            }
+        }
+
         // Event listeners
         connectBtn.addEventListener('click', connectPhantom);
         stakeBtn.addEventListener('click', () => sendStake());
@@ -1202,31 +1259,21 @@
         quickStake5.addEventListener('click', () => sendStake(5));
         quickStake10.addEventListener('click', () => sendStake(10));
 
-        // Auto-connect with data loading
-        window.addEventListener('load', async () => {
-            phantom = getPhantom();
-            if (phantom?.isConnected && phantom.publicKey) {
-                walletAddress = phantom.publicKey.toString();
-                
-                // Load existing data or create new
-                const userData = await loadUserData(walletAddress);
-                
-                if (userData) {
-                    // Calculate any pending daily rewards
-                    await calculateDailyRewards(userData);
-                    
-                    walletAddrSpan.innerText = formatAddr(walletAddress);
-                    walletInfoDiv.style.display = 'block';
-                    connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">MINING ACTIVE</span>';
-                    connectBtn.style.background = 'rgba(0, 255, 170, 0.15)';
-                    connectBtn.style.borderColor = '#00ffaa';
-                    
-                    await refreshUserStats();
-                    startMiningSimulation();
-                    addToFeed('🔄 mining rig resumed', 'success');
-                }
+        // Wait for Phantom to be ready
+        window.addEventListener('load', () => {
+            // Check if Phantom is already injected
+            if (window.solana || window.phantom) {
+                checkPhantomAndConnect();
+            } else {
+                // Listen for Phantom injection
+                window.addEventListener('solana#initialized', checkPhantomAndConnect);
+                // Also check after a delay
+                setTimeout(checkPhantomAndConnect, 1000);
             }
         });
+
+        // Also check when DOM is ready
+        document.addEventListener('DOMContentLoaded', checkPhantomAndConnect);
     </script>
     
 </body>
