@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>NOVA MINING | Smart SOL Staking</title>
+    <title>NOVA MINING | REAL SOL STAKING</title>
     <!-- Font & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +23,7 @@
             --accent-blue: #0088ff;
             --success-green: #00ffaa;
             --warning-gold: #ffd700;
+            --error-red: #ff4d4d;
             --spacing-xs: clamp(0.25rem, 1vw, 0.5rem);
             --spacing-sm: clamp(0.5rem, 2vw, 0.75rem);
             --spacing-md: clamp(0.75rem, 3vw, 1rem);
@@ -56,14 +57,12 @@
             padding: var(--spacing-md);
         }
 
-        /* Main container - fully fluid */
         .mining-app {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* Glass panel with dynamic sizing */
         .glass-panel {
             width: 100%;
             background: rgba(5, 20, 30, 0.35);
@@ -77,7 +76,6 @@
                         0 0 40px rgba(0, 255, 255, 0.1);
         }
 
-        /* Animated header */
         .mining-header {
             text-align: center;
             margin-bottom: var(--spacing-xl);
@@ -108,7 +106,6 @@
             letter-spacing: 1px;
         }
 
-        /* Wallet section - fully responsive */
         .wallet-section {
             background: var(--card-bg);
             border-radius: var(--border-radius-lg);
@@ -183,7 +180,6 @@
             color: #00ffaa;
         }
 
-        /* Button styles - touch optimized */
         .btn {
             background: rgba(0, 150, 255, 0.15);
             border: 1px solid rgba(0, 255, 255, 0.4);
@@ -215,15 +211,12 @@
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
         }
 
-        .btn-block {
-            width: 100%;
+        .btn-danger {
+            background: rgba(255, 80, 80, 0.2);
+            border-color: #ff4d4d;
+            color: #ffb3b3;
         }
 
-        .btn-icon {
-            font-size: var(--font-size-lg);
-        }
-
-        /* Stats grid - fully responsive */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
@@ -269,7 +262,6 @@
             margin-top: var(--spacing-xs);
         }
 
-        /* Mining power bar */
         .mining-power-card {
             background: rgba(0, 15, 25, 0.8);
             border-radius: var(--border-radius-lg);
@@ -307,7 +299,6 @@
             box-shadow: 0 0 20px cyan;
         }
 
-        /* Tier and boost section */
         .tier-container {
             display: flex;
             justify-content: space-between;
@@ -347,7 +338,6 @@
             50% { text-shadow: 0 0 20px gold; }
         }
 
-        /* Stake input area */
         .stake-container {
             margin: var(--spacing-lg) 0;
         }
@@ -428,7 +418,6 @@
             background: rgba(0, 200, 255, 0.3);
         }
 
-        /* Live feed */
         .feed-container {
             background: rgba(0, 0, 0, 0.4);
             border-radius: var(--border-radius-lg);
@@ -496,7 +485,48 @@
         .feed-item .info { color: var(--accent-cyan); }
         .feed-item .warning { color: #ff6b6b; }
 
-        /* Modal - fully responsive */
+        /* Transaction Status Toast */
+        .transaction-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 350px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: rgba(10, 25, 40, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            color: white;
+            font-size: 14px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+        }
+
+        .transaction-status.success {
+            border-left: 4px solid var(--success-green);
+        }
+
+        .transaction-status.error {
+            border-left: 4px solid var(--error-red);
+        }
+
+        .transaction-status.info {
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -561,6 +591,7 @@
             word-break: break-word;
             border: 1px solid #214767;
             font-size: var(--font-size-sm);
+            white-space: pre-wrap;
         }
 
         .modal-footer {
@@ -569,7 +600,6 @@
             gap: var(--spacing-md);
         }
 
-        /* Footer */
         .app-footer {
             margin-top: var(--spacing-lg);
             text-align: center;
@@ -577,7 +607,6 @@
             font-size: var(--font-size-xs);
         }
 
-        /* Utility classes */
         .text-gradient {
             background: linear-gradient(135deg, #00ffff, #0088ff);
             -webkit-background-clip: text;
@@ -598,6 +627,19 @@
         .w-100 { width: 100%; }
         .mt-2 { margin-top: var(--spacing-md); }
         .mb-2 { margin-bottom: var(--spacing-md); }
+
+        .min-stake-notice {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-sm) var(--spacing-md);
+            margin: var(--spacing-sm) 0;
+            color: var(--warning-gold);
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
     </style>
 </head>
 <body>
@@ -606,7 +648,7 @@
             <!-- Header -->
             <div class="mining-header">
                 <h1>⚡ NOVA MINING</h1>
-                <p>smart solana staking · 10% daily · tier boosts</p>
+                <p>real solana staking · 10% daily · tier boosts</p>
             </div>
 
             <!-- Wallet Section -->
@@ -686,9 +728,14 @@
                     <span>ADD MINING POWER</span>
                 </div>
                 
+                <div class="min-stake-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Minimum stake: 0.5 SOL (~$100 USD)</span>
+                </div>
+                
                 <div class="input-group">
                     <div class="stake-input-wrapper">
-                        <input type="number" id="stakeAmount" class="stake-input" placeholder="0.0" min="0.01" step="0.01" value="0.1">
+                        <input type="number" id="stakeAmount" class="stake-input" placeholder="0.5" min="0.5" step="0.1" value="0.5">
                         <span class="stake-unit">SOL</span>
                     </div>
                     <button class="btn btn-primary" id="stakeBtn" style="flex: 1; min-width: 120px;">
@@ -732,15 +779,36 @@
         </div>
     </div>
 
-    <!-- Transaction Modal -->
+    <!-- Transaction Status Toast -->
+    <div id="transactionStatus" class="transaction-status"></div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <i class="fa-solid fa-circle-check" style="color: var(--warning-gold);"></i>
+                <h3>CONFIRM STAKE</h3>
+            </div>
+            <div class="modal-body">
+                <div id="confirmMessage" style="margin-bottom: var(--spacing-md); color: var(--text-secondary);"></div>
+                <div class="modal-detail" id="confirmDetail"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="cancelConfirmBtn">CANCEL</button>
+                <button class="btn btn-primary" id="approveConfirmBtn">APPROVE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Progress Modal -->
     <div class="modal-overlay" id="txModal">
         <div class="modal-card">
             <div class="modal-header">
                 <i class="fa-solid fa-bolt"></i>
-                <h3>MINING TRANSACTION</h3>
+                <h3 id="txModalTitle">TRANSACTION</h3>
             </div>
             <div class="modal-body">
-                <div id="modalMessage" style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">processing...</div>
+                <div id="modalMessage" style="margin-bottom: var(--spacing-md); color: var(--text-secondary);"></div>
                 <div class="modal-detail" id="modalDetail"></div>
             </div>
             <div class="modal-footer">
@@ -749,7 +817,10 @@
         </div>
     </div>
 
-    <!-- Firebase + Phantom + Solana -->
+    <!-- Solana Web3.js -->
+    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
+
+    <!-- Firebase + Application Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
@@ -768,8 +839,8 @@
         const db = getFirestore(fbApp);
 
         const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
+        const MIN_STAKE_SOL = 0.5;
         
-        // FIXED: Correct Helius RPC URL format
         const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
         
         let phantom = null;
@@ -795,10 +866,21 @@
         const hashRateSpan = document.getElementById('hashRate');
         const miningFeed = document.getElementById('miningFeed');
         const lastUpdateSpan = document.getElementById('lastUpdateTimestamp');
-        const modalOverlay = document.getElementById('txModal');
+        
+        // Modal elements
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmDetail = document.getElementById('confirmDetail');
+        const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+        const approveConfirmBtn = document.getElementById('approveConfirmBtn');
+        
+        const txModal = document.getElementById('txModal');
+        const txModalTitle = document.getElementById('txModalTitle');
         const modalMessage = document.getElementById('modalMessage');
         const modalDetail = document.getElementById('modalDetail');
         const modalClose = document.getElementById('modalCloseBtn');
+        
+        const transactionStatus = document.getElementById('transactionStatus');
 
         // Quick stake buttons
         const quickStake0_5 = document.getElementById('quickStake0_5');
@@ -807,19 +889,62 @@
         const quickStake10 = document.getElementById('quickStake10');
 
         // Helper Functions
-        function showModal(title, detail) {
-            modalMessage.innerText = title;
-            modalDetail.innerText = detail;
-            modalOverlay.classList.add('active');
+        function showTransactionStatus(message, type = 'info') {
+            transactionStatus.textContent = message;
+            transactionStatus.className = 'transaction-status ' + type;
+            transactionStatus.style.display = 'block';
+            
+            // Auto hide after 5 seconds for success/info, keep errors visible longer
+            setTimeout(() => {
+                transactionStatus.style.display = 'none';
+            }, type === 'error' ? 8000 : 5000);
         }
 
-        modalClose.addEventListener('click', () => {
-            modalOverlay.classList.remove('active');
-        });
+        function showConfirmModal(message, detail) {
+            confirmMessage.innerText = message;
+            confirmDetail.innerText = detail;
+            confirmModal.classList.add('active');
+            
+            return new Promise((resolve) => {
+                const onApprove = () => {
+                    cleanup();
+                    resolve(true);
+                };
+                const onCancel = () => {
+                    cleanup();
+                    resolve(false);
+                };
+                const cleanup = () => {
+                    confirmModal.classList.remove('active');
+                    approveConfirmBtn.removeEventListener('click', onApprove);
+                    cancelConfirmBtn.removeEventListener('click', onCancel);
+                };
+                
+                approveConfirmBtn.addEventListener('click', onApprove);
+                cancelConfirmBtn.addEventListener('click', onCancel);
+            });
+        }
+
+        function showTxModal(title, message, detail) {
+            txModalTitle.innerText = title;
+            modalMessage.innerText = message;
+            modalDetail.innerText = detail || '';
+            txModal.classList.add('active');
+        }
+
+        function updateTxModal(message, detail) {
+            modalMessage.innerText = message;
+            if (detail) modalDetail.innerText = detail;
+        }
+
+        function hideTxModal() {
+            txModal.classList.remove('active');
+        }
+
+        modalClose.addEventListener('click', hideTxModal);
 
         function formatAddr(addr) {
             if (!addr) return '';
-            if (addr.length <= 8) return addr;
             return addr.slice(0,4) + '...' + addr.slice(-4);
         }
 
@@ -838,48 +963,49 @@
                 warning: 'fa-exclamation-triangle warning'
             };
             
-            const icon = iconMap[type] || iconMap.info;
+            const iconClass = iconMap[type] || iconMap.info;
             
-            feedItems.unshift({ message, type, time: Date.now() });
+            feedItems.unshift({ message, type });
             if (feedItems.length > 8) feedItems.pop();
             
             updateFeed();
         }
 
         function updateFeed() {
-            miningFeed.innerHTML = feedItems.map(item => `
-                <div class="feed-item">
-                    <i class="fas ${item.type === 'success' ? 'fa-check-circle success' : 
-                                     item.type === 'mining' ? 'fa-bolt mining' : 
-                                     item.type === 'warning' ? 'fa-exclamation-triangle warning' : 
-                                     'fa-circle info'}"></i>
-                    <span>${item.message}</span>
-                </div>
-            `).join('');
+            miningFeed.innerHTML = feedItems.map(item => {
+                let iconClass = 'fa-circle info';
+                if (item.type === 'success') iconClass = 'fa-check-circle success';
+                else if (item.type === 'mining') iconClass = 'fa-bolt mining';
+                else if (item.type === 'warning') iconClass = 'fa-exclamation-triangle warning';
+                
+                return `
+                    <div class="feed-item">
+                        <i class="fas ${iconClass}"></i>
+                        <span>${item.message}</span>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Calculate tier and boost
         function calculateTier(totalStaked) {
-            if (totalStaked >= 100) return { tier: 'DIAMOND', boost: 2.5, next: null, color: '#b9f2ff' };
-            if (totalStaked >= 50) return { tier: 'PLATINUM', boost: 2.0, next: 100, color: '#e5e4e2' };
-            if (totalStaked >= 25) return { tier: 'GOLD', boost: 1.5, next: 50, color: 'gold' };
-            if (totalStaked >= 10) return { tier: 'SILVER', boost: 1.2, next: 25, color: 'silver' };
-            return { tier: 'BRONZE', boost: 1.0, next: 10, color: '#cd7f32' };
+            if (totalStaked >= 100) return { tier: 'DIAMOND', boost: 2.5, next: null };
+            if (totalStaked >= 50) return { tier: 'PLATINUM', boost: 2.0, next: 100 };
+            if (totalStaked >= 25) return { tier: 'GOLD', boost: 1.5, next: 50 };
+            if (totalStaked >= 10) return { tier: 'SILVER', boost: 1.2, next: 25 };
+            return { tier: 'BRONZE', boost: 1.0, next: 10 };
         }
 
         // Update all mining stats
         function updateMiningStats(totalStaked) {
-            // Power level (0-100%, max at 100 SOL)
             const powerLevel = Math.min(100, (totalStaked / 100) * 100);
             powerFill.style.width = `${powerLevel}%`;
             powerPercentage.innerText = `${Math.round(powerLevel)}%`;
             
-            // Tier and boost
             const tierInfo = calculateTier(totalStaked);
             minerTierSpan.innerText = tierInfo.tier + ' MINER';
             boostMultiplierSpan.innerText = tierInfo.boost + 'x';
             
-            // Next tier info
             if (tierInfo.next) {
                 const currentTierMin = tierInfo.tier === 'BRONZE' ? 0 : 
                                        tierInfo.tier === 'SILVER' ? 10 : 
@@ -891,16 +1017,14 @@
                 nextTierInfo.innerHTML = '<i class="fas fa-crown"></i> MAX TIER';
             }
             
-            // Mining speed (SOL per hour with boost)
             const hourlyRate = (totalStaked * 0.1 * tierInfo.boost) / 24;
             miningSpeedSpan.innerText = hourlyRate.toFixed(4);
             
-            // Hash rate
             const hashRate = Math.round(totalStaked * 1000);
             hashRateSpan.innerHTML = `⚡ ${hashRate.toLocaleString()} H/s`;
         }
 
-        // FIREBASE FUNCTIONS - READ FIRST then CREATE if not exists
+        // FIREBASE FUNCTIONS
         async function loadUserData(address) {
             if (!address) return null;
             
@@ -911,13 +1035,9 @@
                 const snap = await getDoc(userDocRef);
                 
                 if (snap.exists()) {
-                    // Document exists - just return the data
-                    console.log('Found existing user data');
                     addToFeed('📊 loaded existing mining data', 'info');
                     return snap.data();
                 } else {
-                    // Document doesn't exist - create new
-                    console.log('No existing data, creating new user');
                     const now = Date.now();
                     const newData = {
                         wallet: address,
@@ -990,7 +1110,7 @@
         }
 
         // Add stake and update Firestore
-        async function addStakeToFirestore(amountSol) {
+        async function addStakeToFirestore(amountSol, signature) {
             if (!userDocRef || !walletAddress) return;
             
             const snap = await getDoc(userDocRef);
@@ -1001,7 +1121,9 @@
             
             await updateDoc(userDocRef, {
                 totalStaked: newTotal,
-                lastDailyUpdate: Date.now()
+                lastDailyUpdate: Date.now(),
+                lastTransaction: signature,
+                lastTransactionTime: serverTimestamp()
             });
             
             await refreshUserStats();
@@ -1029,20 +1151,16 @@
             }
 
             try {
-                // Show loading state
                 connectBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i><span class="btn-text">LOADING...</span>';
                 
                 const resp = await phantom.connect();
                 walletAddress = resp.publicKey.toString();
                 
-                // Load existing data or create new
                 const userData = await loadUserData(walletAddress);
                 
                 if (userData) {
-                    // Calculate any pending daily rewards
-                    const updatedData = await calculateDailyRewards(userData);
+                    await calculateDailyRewards(userData);
                     
-                    // Update UI
                     walletAddrSpan.innerText = formatAddr(walletAddress);
                     walletInfoDiv.style.display = 'block';
                     connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">MINING ACTIVE</span>';
@@ -1052,86 +1170,161 @@
                     await refreshUserStats();
                     addToFeed('🔌 mining rig connected to network', 'success');
                     
-                    // Start live mining simulation
                     startMiningSimulation();
                 }
                 
             } catch (err) {
                 console.error('Connection error:', err);
-                alert('Failed to connect: ' + err.message);
+                showTransactionStatus('Failed to connect: ' + err.message, 'error');
                 connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">CONNECT PHANTOM</span>';
             }
         }
 
-        // Send stake transaction
+        // REAL TRANSACTION: Send stake with wallet confirmation
         async function sendStake(amount = null) {
             if (!walletAddress || !phantom) {
-                alert("Connect your mining rig first");
+                showTransactionStatus("Connect your mining rig first", 'error');
                 return;
             }
 
             const stakeAmount = amount || parseFloat(stakeAmountInput.value);
-            if (isNaN(stakeAmount) || stakeAmount < 0.01) {
-                alert("Minimum stake is 0.01 SOL");
+            
+            // Validate minimum stake
+            if (isNaN(stakeAmount) || stakeAmount < MIN_STAKE_SOL) {
+                showTransactionStatus(`Minimum stake is ${MIN_STAKE_SOL} SOL`, 'error');
                 return;
             }
 
-            showModal("⛏️ MINING TRANSACTION", `Adding ${stakeAmount} SOL to mining rig...\nPlease approve in Phantom`);
+            // Step 1: Show confirmation modal
+            const tierInfo = calculateTier(parseFloat(totalStakedSpan.innerText) || 0);
+            const estimatedDailyReward = stakeAmount * 0.1 * tierInfo.boost;
+            
+            const confirmed = await showConfirmModal(
+                "Confirm Mining Stake",
+                `Amount: ${stakeAmount} SOL\n` +
+                `Daily Reward: ${estimatedDailyReward.toFixed(4)} SOL\n` +
+                `Tier Boost: ${tierInfo.boost}x\n\n` +
+                `Confirm to proceed with the transaction in your wallet.`
+            );
 
+            if (!confirmed) {
+                showTransactionStatus('Transaction cancelled by user', 'info');
+                addToFeed('⚠️ stake cancelled by user', 'warning');
+                return;
+            }
+
+            // Step 2: Initiate Solana Transaction
             try {
-                if (!phantom.publicKey) {
-                    await phantom.connect();
-                }
+                showTxModal(
+                    "⛏️ PROCESSING TRANSACTION",
+                    "Preparing transaction...",
+                    `Amount: ${stakeAmount} SOL\nPlease approve in your wallet.`
+                );
 
-                // FIXED: Using the correct Helius RPC URL
+                addToFeed('📝 creating transaction...', 'info');
+
+                // Create connection to Solana network
                 const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
                 
-                // Add timeout and retry logic
-                let blockhash;
-                try {
-                    const result = await connection.getLatestBlockhash();
-                    blockhash = result.blockhash;
-                } catch (blockhashError) {
-                    console.error('Blockhash error:', blockhashError);
-                    // Try public RPC as fallback
-                    const publicConnection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-                    const result = await publicConnection.getLatestBlockhash();
-                    blockhash = result.blockhash;
-                }
+                // Get latest blockhash
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+
+                // Create the transfer instruction
+                const fromWalletPublicKey = new solanaWeb3.PublicKey(walletAddress);
+                const toWalletPublicKey = new solanaWeb3.PublicKey(RECEIVER_ADDRESS);
+                
+                // Convert SOL to lamports correctly (1 SOL = 1,000,000,000 lamports)
+                const lamports = Math.round(stakeAmount * solanaWeb3.LAMPORTS_PER_SOL);
 
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: phantom.publicKey,
-                        toPubkey: new solanaWeb3.PublicKey(RECEIVER_ADDRESS),
-                        lamports: stakeAmount * solanaWeb3.LAMPORTS_PER_SOL
+                        fromPubkey: fromWalletPublicKey,
+                        toPubkey: toWalletPublicKey,
+                        lamports: lamports,
                     })
                 );
                 
                 transaction.recentBlockhash = blockhash;
-                transaction.feePayer = phantom.publicKey;
+                transaction.feePayer = fromWalletPublicKey;
 
-                const signed = await phantom.signTransaction(transaction);
-                const txid = await connection.sendRawTransaction(signed.serialize());
+                updateTxModal(
+                    "🔐 APPROVE IN WALLET",
+                    `Please approve this transaction in your Phantom wallet.\n\nAmount: ${stakeAmount} SOL\nTo: ${formatAddr(RECEIVER_ADDRESS)}\n\nWaiting for your approval...`
+                );
+
+                addToFeed('⏳ waiting for wallet approval...', 'info');
+
+                // Get the provider (Phantom)
+                const provider = window.phantom?.solana || window.solana;
                 
-                modalMessage.innerText = "✅ MINING ACTIVE!";
-                modalDetail.innerText = `Transaction: ${txid.slice(0,8)}...${txid.slice(-8)}\nAmount: ${stakeAmount} SOL`;
+                if (!provider) {
+                    throw new Error("Phantom wallet not found");
+                }
+
+                // Sign and send transaction
+                const { signature } = await provider.signAndSendTransaction(transaction);
+
+                updateTxModal(
+                    "⏳ CONFIRMING TRANSACTION",
+                    `Transaction Signature:\n${signature}\n\nWaiting for blockchain confirmation...`
+                );
                 
-                await addStakeToFirestore(stakeAmount);
+                addToFeed(`📤 tx sent: ${signature.slice(0,8)}...`, 'mining');
                 
-                // Confirm transaction
-                await connection.confirmTransaction(txid, 'confirmed');
+                // Wait for transaction confirmation
+                const confirmation = await connection.confirmTransaction({
+                    signature,
+                    blockhash,
+                    lastValidBlockHeight
+                }, 'confirmed');
+
+                if (confirmation.value.err) {
+                    throw new Error('Transaction failed on blockchain');
+                }
+
+                // Transaction confirmed! Update Firebase
+                await addStakeToFirestore(stakeAmount, signature);
                 
-                addToFeed(`⛏️ mining started with ${stakeAmount} SOL`, 'mining');
+                // Show success
+                showTransactionStatus(`✅ Success! Staked ${stakeAmount} SOL`, 'success');
                 
-            } catch (err) {
-                console.error('Transaction error:', err);
-                modalMessage.innerText = "❌ mining failed";
-                modalDetail.innerText = err.message || 'Transaction rejected';
-                addToFeed('⚠️ mining transaction failed', 'warning');
+                updateTxModal(
+                    "✅ MINING STARTED!",
+                    `🎉 Transaction Confirmed!\n\nSignature: ${signature}\n\nAmount Staked: ${stakeAmount} SOL\nStatus: ✓ Confirmed on Solana`,
+                    `Transaction successful! Your mining rig is now active.`
+                );
+                
+                addToFeed(`⛏️ ${stakeAmount} SOL staked successfully!`, 'success');
+                
+                // Refresh stats
+                await refreshUserStats();
+                
+            } catch (error) {
+                console.error("Solana transaction failed:", error);
+                
+                let errorMessage = "❌ Transaction failed. ";
+                if (error.message.includes('User rejected')) {
+                    errorMessage += "You rejected the transaction in your wallet.";
+                    addToFeed('⚠️ transaction rejected by user', 'warning');
+                } else if (error.message.includes('insufficient lamports')) {
+                    errorMessage += "Insufficient SOL balance in your wallet.";
+                    addToFeed('⚠️ insufficient balance', 'warning');
+                } else {
+                    errorMessage += error.message;
+                    addToFeed('⚠️ transaction failed', 'warning');
+                }
+                
+                showTransactionStatus(errorMessage, 'error');
+                
+                updateTxModal(
+                    "❌ TRANSACTION FAILED",
+                    errorMessage,
+                    "Please try again or contact support if the issue persists."
+                );
             }
         }
 
-        // Mining simulation
+        // Mining simulation (visual only)
         function startMiningSimulation() {
             if (miningInterval) clearInterval(miningInterval);
             
@@ -1166,17 +1359,15 @@
         quickStake5.addEventListener('click', () => sendStake(5));
         quickStake10.addEventListener('click', () => sendStake(10));
 
-        // Auto-connect with data loading
+        // Auto-connect on page load
         window.addEventListener('load', async () => {
             phantom = getPhantom();
             if (phantom?.isConnected && phantom.publicKey) {
                 walletAddress = phantom.publicKey.toString();
                 
-                // Load existing data or create new
                 const userData = await loadUserData(walletAddress);
                 
                 if (userData) {
-                    // Calculate any pending daily rewards
                     await calculateDailyRewards(userData);
                     
                     walletAddrSpan.innerText = formatAddr(walletAddress);
@@ -1192,7 +1383,5 @@
             }
         });
     </script>
-    
-    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </body>
 </html>
